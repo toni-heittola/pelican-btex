@@ -1,0 +1,4 @@
+beautifulsoup4 >= 4.4.1
+pybtex >= 0.20.1
+rcssmin >= 1.0.6
+jsmin >= 2.2.1
