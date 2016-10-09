@@ -100,7 +100,7 @@ Publication list generation is injected to `<div>` tags with class `btex`.
 | data-stats                | Boolean   | False         | Show statistics of the publication list, e.g. entries per publication groups |
 | data-scholar-cite-counts  | Boolean   | False         | Query citation counts for the publications from Google Scholar |
 | data-scholar-link         | String    | None          | Link to Google Scholar profile |
- 
+| data-target-page          | String    | None          | Page slug containing full publication list, used in `latest` template. |
 
 Publication list showing citations counts and publications counts per publication types, example:
  
@@ -108,7 +108,7 @@ Publication list showing citations counts and publications counts per publicatio
  
 Latest publications from last two years, example:
 
-    <div class="btex" data-source="content/data/publications.bib" data-years="2" data-template="latest"></div>
+    <div class="btex" data-source="content/data/publications.bib" data-years="2" data-template="latest" data-target-page="publications"></div>
 
 ### Bibtex
 

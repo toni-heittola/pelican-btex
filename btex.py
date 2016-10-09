@@ -450,7 +450,7 @@ def get_default_template(options):
                     <div class="col-xs-8">
                         {{item.text}}
                         {% if item.award %}<span class="label label-success">{{item.award}}</span> {% endif %}
-                        <a href="bibtexx_md#{{item.key}}" title="Read more..." style="text-decoration:none;border-bottom:0;" ><i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{target_page}}#{{item.key}}" title="Read more..." style="text-decoration:none;border-bottom:0;" ><i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                     <div class="col-xs-3">
                         <div class="btn-group">
@@ -642,6 +642,8 @@ def btex_parse(content):
         options['scholar-link'] = get_attribute(btex_div.attrs, 'scholar-link', None)
 
         options['stats'] = boolean(get_attribute(btex_div.attrs, 'stats', 'no'))
+
+        options['target_page'] = get_attribute(btex_div.attrs, 'target-page', None)
 
         if options['years']:
             options['first_visible_year'] = int(datetime.now().strftime('%Y')) - int(options['years'])
@@ -881,7 +883,8 @@ def btex_parse(content):
         div_html = BeautifulSoup(template.render(publications=publications,
                                                  meta=meta,
                                                  publication_grouping=btex_publication_grouping,
-                                                 first_visible_year=options['first_visible_year']
+                                                 first_visible_year=options['first_visible_year'],
+                                                 target_page=options['target_page']
                                                  ), "html.parser")
         btex_div.replaceWith(div_html)
 
