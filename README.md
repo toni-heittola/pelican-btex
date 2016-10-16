@@ -98,13 +98,14 @@ Publication list generation is injected to `<div>` tags with class `btex`.
 | data-template             | String    | 'publications'  | Template type: `publications` (publications list), `minimal` (compact publications list), `latest` (compresses list of latest publications), and `supervisions` (list of supervised thesis and student projects).  |
 | data-years                | Number    | None          | Number of the most recent year to be shown |
 | data-stats                | Boolean   | False         | Show statistics of the publication list, e.g. entries per publication groups |
+| data-citations            | String    | 'btex_citation_cache.yaml' | Citation cache file, YAML file |
 | data-scholar-cite-counts  | Boolean   | False         | Query citation counts for the publications from Google Scholar |
 | data-scholar-link         | String    | None          | Link to Google Scholar profile |
 | data-target-page          | String    | None          | Page slug containing full publication list, used in `latest` template. |
 
 Publication list showing citations counts and publications counts per publication types, example:
  
-    <div class="btex" data-source="content/data/publications.bib" data-scholar-cite-counts="true" data-stats="true" data-template="publications"></div>
+    <div class="btex" data-source="content/data/publications.bib" data-citations="content/data/citations.yaml" data-scholar-cite-counts="true" data-stats="true" data-template="publications"></div>
  
 Latest publications from last two years, example:
 
@@ -210,4 +211,4 @@ Parameters for the plugin can be set in  `pelicanconf.py' with following paramet
 
 ## Getting citation counts 
 
-This plugin is fetching citation counts for articles from Google by using [scholar.py](https://github.com/ckreibich/scholar.py). Google has query limits and exceeding these limits will blacklist your IP for a while. The plugin will try to minimize amount of queries. All query results are stored in the cache file at the root of the Pelican project (`google_scholar_cache.cpickle`). Timestamps are used to decide which articles needs update, and only predefined amount of queries are made per session. There is also random waiting time assigned between queries. This procedure might be problematic at the beginning when large amount of articles are inserted, as only small portion is queried at each session. However, once all articles are queried the plugins should maintain citation count rather close to the one reported by Google Scholar with minimal queries.    
+This plugin is fetching citation counts for articles from Google by using [scholar.py](https://github.com/ckreibich/scholar.py). Google has query limits and exceeding these limits will blacklist your IP for a while. The plugin will try to minimize amount of queries. All query results are stored in the cache file at the root of the Pelican project (`btex_citation_cache.yaml`, or set file with `data-citations`). Timestamps are used to decide which articles needs update, and only predefined amount of queries are made per session. There is also random waiting time assigned between queries. This procedure might be problematic at the beginning when large amount of articles are inserted, as only small portion is queried at each session. However, once all articles are queried the plugins should maintain citation count rather close to the one reported by Google Scholar with minimal queries.    
