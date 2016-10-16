@@ -638,7 +638,8 @@ def btex_parse(content):
         options['css'] = btex_div['class']
 
         options['data_source'] = get_attribute(btex_div.attrs, 'source', None)
-        options['citations'] = get_attribute(btex_div.attrs, 'citations', None)
+        options['citations'] = get_attribute(btex_div.attrs, 'citations', 'btex_citation_cache.yaml')
+
         citation_data = load_citation_data(filename=options['citations'])
         options['template'] = get_attribute(btex_div.attrs, 'template', 'publications')
 
@@ -842,9 +843,10 @@ def btex_parse(content):
 
 
 def get_citation_data(citation_data, title, year):
-    for cite in citation_data:
-        if str(title).lower() == cite['title'].lower() and int(year) == int(cite['year']):
-            return cite
+    if citation_data:
+        for cite in citation_data:
+            if 'title' in cite and 'year' in cite and str(title).lower() == cite['title'].lower() and int(year) == int(cite['year']):
+                return cite
     return None
 
 
@@ -930,7 +932,7 @@ def load_citation_data(filename):
             return None
 
     else:
-        return None
+        return []
 
 
 def save_citation_data(filename, citation_data):
@@ -944,12 +946,13 @@ def oldest_citation_update(citation_data, publications):
         current_citation_data = get_citation_data(citation_data=citation_data,
                                                   title=pub['title'],
                                                   year=pub['year'])
-        last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
-        if not cite_update:
-            cite_update = last_fetch
+        if current_citation_data and 'last_update' in current_citation_data:
+            last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+            if not cite_update:
+                cite_update = last_fetch
 
-        if last_fetch < cite_update:
-            cite_update = last_fetch
+            if last_fetch < cite_update:
+                cite_update = last_fetch
 
     return cite_update
 
