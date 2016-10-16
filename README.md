@@ -29,6 +29,10 @@ Installation instructions
 
     pip install pybtex
 
+**pyyaml**, for yaml reading 
+
+    pip install pyyaml
+
 In order to regenerate minified CSS and JS files you need also: 
 
 **rcssmin** a CSS Minifier
