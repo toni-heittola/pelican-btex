@@ -22,8 +22,10 @@ import time
 import logging
 import collections
 import shutil
+import yaml
 from random import randint
 from time import sleep
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 __version__ = '0.1.0'
@@ -634,7 +636,10 @@ def btex_parse(content):
     for btex_div in btex_divs:
         options = {}
         options['css'] = btex_div['class']
+
         options['data_source'] = get_attribute(btex_div.attrs, 'source', None)
+        options['citations'] = get_attribute(btex_div.attrs, 'citations', None)
+        citation_data = load_citation_data(filename=options['citations'])
         options['template'] = get_attribute(btex_div.attrs, 'template', 'publications')
 
         options['years'] = get_attribute(btex_div.attrs, 'years', None)
@@ -654,95 +659,41 @@ def btex_parse(content):
         meta = {}
         if 'scholar-cite-counts' in options and options['scholar-cite-counts']:
             google_queries = 0
-            citation_tmp_cache = []
-
-            # Greedy way to grab most common author
-            if os.path.isfile(btex_settings['google_scholar']['cache_filename']):
-                citation_cache = pickle.load(open(btex_settings['google_scholar']['cache_filename'], 'rb'))
-            else:
-                citation_cache = {}
-
             google_access_valid = btex_settings['google_scholar']['active']
+            current_timestamp = time.time()
             if google_access_valid:
                 try:
                     import scholar.scholar as sc
+                except ImportError:
+                    logger.warning('`pelican_btex` failed to import `scholar`')
 
-                    author_list = []
-                    citation_update_needed = False
-                    citation_update_count = 0
-                    for pub in publications:
-                        for author in pub['authors']:
-                            name = " ".join(author.first()) + " " + " ".join(author.last())
-                            author_list.append(name)
+                citation_update_needed = False
+                citation_update_count = 0
+                for pub in publications:
+                    current_citation_data = get_citation_data(citation_data, pub['title'], pub['year'])
+                    if current_citation_data:
+                        last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+                        if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
+                            citation_update_needed = True
+                            citation_update_count += 1
+                    else:
+                        citation_update_needed = True
+                        citation_update_count += 1
 
-                            # Form author list
-                            authors = []
-                            for author in pub['authors']:
-                                authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
-                            authors = ", ".join(authors)
-                            # Form cache key
-                            cache_key = authors + pub['title']
-                            cache_key_hash = hashlib.md5(cache_key.encode('utf-8')).hexdigest()
-
-                            if cache_key_hash in citation_cache:
-                                last_fetch = int(citation_cache[cache_key_hash]['time_stamp'])
-                                if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < time.time():
-                                    citation_update_needed = True
-                                    citation_update_count += 1
-                            else:
-                                citation_update_needed = True
-                                citation_update_count += 1
-
-                    if citation_update_needed and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
-                        # Fetch 19 first papers from most common author.
-                        # This is one way to minimize the amount of queries to Google.
-                        logger.warning(" Citation update needed for articles: " +str(citation_update_count))
-
-                        most_common_author = max(set(author_list), key=author_list.count)
-                        querier = sc.ScholarQuerier()
-                        settings = sc.ScholarSettings()
-                        querier.apply_settings(settings)
-
-                        query = sc.SearchScholarQuery()
-                        query.set_author(most_common_author)  # Author
-                        query.set_num_page_results(19)
-                        querier.send_query(query)
-                        google_queries += 1
-                        if len(querier.articles):
-                            for a in querier.articles:
-                                citation_tmp_cache.append(a.attrs)
-                        else:
-                            google_access_valid = False
-                            logger.warning("    It seems your Google access quota is exceeded! ")
-
+                # Update citations before injecting them to the publication list
+                if citation_update_needed:
+                    logger.warning(" Citation update needed for articles: " + str(citation_update_count))
                     # Go publications through paper by paper
                     for pub in publications:
-                        article_data = None
-                        current_timestamp = time.time()
-
-                        for a in citation_tmp_cache:
-                            if a['title'][0] == pub['title']:
-                                article_data = a
-                                break
-
-                        if not article_data and google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
-                            # We did now have article in the cache, check can we query google, as we
+                        if google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
+                            # Check can we query google, as we
                             # only update specified amount of entries (to avoid filling google access quota) with
                             # specified time intervals
+                            current_citation_data = get_citation_data(citation_data=citation_data, title=pub['title'], year=pub['year'])
                             citation_update_needed = False
+                            if current_citation_data:
+                                last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'],'%Y-%m-%d %H:%M:%S').timetuple())
 
-                            # Form author list
-                            authors = []
-                            for author in pub['authors']:
-                                authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
-                            authors = ", ".join(authors)
-
-                            # Form cache key
-                            cache_key = authors+pub['title']
-                            cache_key_hash = hashlib.md5(cache_key.encode('utf-8')).hexdigest()
-
-                            if cache_key_hash in citation_cache:
-                                last_fetch = int(citation_cache[cache_key_hash]['time_stamp'])
                                 if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
                                     citation_update_needed = True
                             else:
@@ -751,9 +702,14 @@ def btex_parse(content):
 
                             if citation_update_needed:
                                 # Fetch article from google
-                                #print "  Query publication ["+pub['title']+"]"
-                                logger.warning("  Query publication ["+pub['title']+"]")
+                                # print "  Query publication ["+pub['title']+"]"
+                                logger.warning("  Query publication [" + pub['title'] + "]")
 
+                                # Form author list
+                                authors = []
+                                for author in pub['authors']:
+                                    authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
+                                authors = ", ".join(authors)
                                 querier = sc.ScholarQuerier()
                                 settings = sc.ScholarSettings()
                                 querier.apply_settings(settings)
@@ -767,76 +723,35 @@ def btex_parse(content):
                                 querier.send_query(query)
                                 google_queries += 1
                                 if len(querier.articles):
-                                    article_data = querier.articles[0].attrs
-                                    logger.warning("    Cites: "+str(article_data['num_citations'][0]))
+                                    update_citation_data(citation_data=citation_data, new_data=querier.articles[0].attrs, title=pub['title'], year=pub['year'], insert_new=True)
+                                    logger.warning("    Cites: "+str(querier.articles[0].attrs['num_citations'][0]))
                                 else:
+                                    update_citation_data_empty(citation_data=citation_data, title=pub['title'], year=pub['year'])
                                     logger.warning("    Nothing returned, article might not be indexed by Google or your access quota is exceeded! ")
 
+                                save_citation_data(filename=options['citations'], citation_data=citation_data)
                                 # Wait after each query random time in order to avoid flooding Google.
                                 wait_time = randint(btex_settings['google_scholar']['fetch_item_timeout'][0],
                                                     btex_settings['google_scholar']['fetch_item_timeout'][1])
                                 print "  Sleeping [" + str(wait_time) + " sec]"
                                 sleep(wait_time)
 
-                        if article_data:
-                            if cache_key_hash not in citation_cache or (article_data['num_citations'][0] > 0 and citation_cache[cache_key_hash]['article_data']['num_citations'][0] == 0):
-                                #print "    UPDATED"
-                                logger.warning("    UPDATED")
-                                if cache_key_hash in citation_cache:
-                                    citation_cache[cache_key_hash]['time_stamp'] = current_timestamp
-                                    citation_cache[cache_key_hash]['article_data'] = article_data
-                                else:
-                                    citation_cache[cache_key_hash] = {
-                                        'time_stamp': current_timestamp,
-                                        'article_data': article_data
-                                    }
-                            else:
-                                if cache_key_hash in citation_cache:
-                                    citation_cache[cache_key_hash]['time_stamp'] = current_timestamp
-                                else:
-                                    citation_cache[cache_key_hash] = {
-                                        'time_stamp': current_timestamp,
-                                    }
-                            if 'article_data' in citation_cache[cache_key_hash] and 'num_citations' in citation_cache[cache_key_hash]['article_data']:
-                                pub['cites'] = citation_cache[cache_key_hash]['article_data']['num_citations'][0]
+            # Inject citation information to the publication list
+            for pub in publications:
+                current_citation_data = get_citation_data(citation_data=citation_data,
+                                                          title=pub['title'],
+                                                          year=pub['year'])
+                if current_citation_data and 'scholar' in current_citation_data and 'total_citations' in current_citation_data['scholar']:
+                    pub['cites'] = current_citation_data['scholar']['total_citations']
+                else:
+                    pub['cites'] = 0
 
-                            if 'article_data' in citation_cache[cache_key_hash] and 'url_citations' in citation_cache[cache_key_hash]['article_data']:
-                                pub['citation_url'] = citation_cache[cache_key_hash]['article_data']['url_citations'][0]
+                if current_citation_data and 'scholar' in current_citation_data and 'citation_list_url' in current_citation_data['scholar']:
+                    pub['citation_url'] = current_citation_data['scholar']['citation_list_url']
+                else:
+                    pub['citation_url'] = None
 
-                            # Save citation cache each time to avoid loosing data.
-                            pickle.dump(citation_cache, open(btex_settings['google_scholar']['cache_filename'], "wb"))
-                        else:
-                            pub['cites'] = 0
-
-                except ImportError:
-                    logger.warning('`pelican_btex` failed to import `scholar`')
-                    pass
-
-            else:
-                for pub in publications:
-                    # Form author list
-                    authors = []
-                    for author in pub['authors']:
-                        authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
-                    authors = ", ".join(authors)
-
-                    # Form cache key
-                    cache_key = authors + pub['title']
-                    cache_key_hash = hashlib.md5(cache_key.encode('utf-8')).hexdigest()
-                    if cache_key_hash in citation_cache:
-                        if 'article_data' in citation_cache[cache_key_hash] and 'num_citations' in citation_cache[cache_key_hash]['article_data']:
-                            pub['cites'] = citation_cache[cache_key_hash]['article_data']['num_citations'][0]
-                        else:
-                            pub['cites'] = 0
-
-                        if 'article_data' in citation_cache[cache_key_hash] and 'url_citations' in citation_cache[cache_key_hash]['article_data']:
-                            pub['citation_url'] = citation_cache[cache_key_hash]['article_data']['url_citations'][0]
-                        else:
-                            pub['citation_url'] = None
-                    else:
-                        pub['cites'] = 0
-
-            meta['cite_update'] = oldest_citation_update(citation_cache, publications)
+            meta['cite_update'] = oldest_citation_update(citation_data, publications)
 
         if 'stats' in options and options['stats']:
             meta['publications'] = len(publications)
@@ -926,27 +841,116 @@ def btex_parse(content):
     content._content = soup.decode()
 
 
-def oldest_citation_update(citation_cache, publications):
+def get_citation_data(citation_data, title, year):
+    for cite in citation_data:
+        if str(title).lower() == cite['title'].lower() and int(year) == int(cite['year']):
+            return cite
+    return None
+
+
+def update_citation_data(citation_data, new_data, title=None, year=None, insert_new=False):
+    current_timestamp = time.time()
+    found = False
+    if not title:
+        title = str(new_data['title'][0]).lower()
+    else:
+        title = str(title.lower())
+
+    if not year:
+        year = int(new_data['year'][0])
+    else:
+        year = int(year)
+
+    for cite in citation_data:
+        if title == cite['title'].lower() and year == int(cite['year']):
+            found = True
+            cite['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+            if new_data['cluster_id'][0]:
+                cite['scholar']['cluster_id'] = str(new_data['cluster_id'][0])
+            if new_data['num_citations'][0]:
+                cite['scholar']['total_citations'] = int(new_data['num_citations'][0])
+            if new_data['url_pdf'][0]:
+                cite['scholar']['pdf_url'] = str(new_data['url_pdf'][0])
+            if new_data['url_citations'][0]:
+                cite['scholar']['citation_list_url'] = str(new_data['url_citations'][0])
+            break
+
+    if not found and insert_new:
+
+        current_cite = {
+            'title': title,
+            'year': year,
+            'last_update': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp)),
+            'scholar': {}
+        }
+
+        if new_data['cluster_id'][0]:
+            current_cite['scholar']['cluster_id'] = str(new_data['cluster_id'][0])
+        if new_data['num_citations'][0]:
+            current_cite['scholar']['total_citations'] = int(new_data['num_citations'][0])
+        if new_data['url_pdf'][0]:
+            current_cite['scholar']['pdf_url'] = str(new_data['url_pdf'][0])
+        if new_data['url_citations'][0]:
+            current_cite['scholar']['citation_list_url'] = str(new_data['url_citations'][0])
+
+        citation_data.append(current_cite)
+
+    return citation_data
+
+
+def update_citation_data_empty(citation_data, title, year):
+    current_timestamp = time.time()
+
+    current_cite = {
+        'title': str(title).lower(),
+        'year': int(year),
+        'last_update': time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp)),
+        'scholar': {
+            'total_citations': 0
+        }
+    }
+
+    citation_data.append(current_cite)
+    return citation_data
+
+
+def load_citation_data(filename):
+    if os.path.isfile(filename):
+        try:
+            with open(filename, 'r') as field:
+                citation_data = yaml.load(field)
+
+            if 'data' in citation_data:
+                citation_data = citation_data['data']
+
+            return citation_data
+
+        except ValueError:
+            logger.warn('`pelican-btex` failed to load file [' + str(filename) + ']')
+            return None
+
+    else:
+        return None
+
+
+def save_citation_data(filename, citation_data):
+    with open(filename, 'w') as outfile:
+        outfile.write(yaml.dump(citation_data, default_flow_style=False))
+
+
+def oldest_citation_update(citation_data, publications):
     cite_update = None
     for pub in publications:
-        # Form author list
-        authors = []
-        for author in pub['authors']:
-            authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
-        authors = ", ".join(authors)
+        current_citation_data = get_citation_data(citation_data=citation_data,
+                                                  title=pub['title'],
+                                                  year=pub['year'])
+        last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+        if not cite_update:
+            cite_update = last_fetch
 
-        # Form cache key
-        cache_key = authors + pub['title']
-        cache_key_hash = hashlib.md5(cache_key.encode('utf-8')).hexdigest()
+        if last_fetch < cite_update:
+            cite_update = last_fetch
 
-        if cache_key_hash in citation_cache:
-            last_fetch = int(citation_cache[cache_key_hash]['time_stamp'])
-
-            # store latest fetch timestamp
-            if not cite_update:
-                cite_update = last_fetch
-            if last_fetch < cite_update:
-                cite_update = last_fetch
     return cite_update
 
 
