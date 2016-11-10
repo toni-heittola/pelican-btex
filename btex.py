@@ -807,7 +807,7 @@ def btex_parse(content):
     if btex_settings['minified']:
         html_elements = {
             'js_include': [
-                '<script type="text/javascript" src="theme/js/btex.min.js"></script>'
+                '<script type="text/javascript" src="/theme/js/btex.min.js"></script>'
             ],
             'css_include': [
             #    '<link rel="stylesheet" href="theme/css/btex.min.css">'
@@ -816,7 +816,7 @@ def btex_parse(content):
     else:
         html_elements = {
             'js_include': [
-                '<script type="text/javascript" src="theme/js/btex.js"></script>'
+                '<script type="text/javascript" src="/theme/js/btex.js"></script>'
             ],
             'css_include': [
             #    '<link rel="stylesheet" href="theme/css/btex.css">'
