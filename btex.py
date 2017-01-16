@@ -41,6 +41,7 @@ btex_settings = {
     'minified': True,
     'generate_minified': True,
     'use_fontawesome_cdn': True,
+    'site-url': ''
 }
 
 btex_publication_grouping = {
@@ -807,7 +808,7 @@ def btex_parse(content):
     if btex_settings['minified']:
         html_elements = {
             'js_include': [
-                '<script type="text/javascript" src="/theme/js/btex.min.js"></script>'
+                '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.min.js"></script>'
             ],
             'css_include': [
             #    '<link rel="stylesheet" href="theme/css/btex.min.css">'
@@ -816,7 +817,7 @@ def btex_parse(content):
     else:
         html_elements = {
             'js_include': [
-                '<script type="text/javascript" src="/theme/js/btex.js"></script>'
+                '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.js"></script>'
             ],
             'css_include': [
             #    '<link rel="stylesheet" href="theme/css/btex.css">'
@@ -1093,6 +1094,8 @@ def minify_js_directory(gen, source, target):
 
 def init_default_config(pelican):
     # Handle settings from pelicanconf.py
+    btex_settings['site-url'] = pelican.settings['SITEURL']
+
     if 'BTEX_SCHOLAR_ACTIVE' in pelican.settings:
         btex_settings['google_scholar']['active'] = pelican.settings['BTEX_SCHOLAR_ACTIVE']
 
