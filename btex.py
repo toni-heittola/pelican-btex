@@ -753,7 +753,7 @@ def btex_parse(content):
                 else:
                     pub['citation_url'] = None
 
-            meta['cite_update'] = oldest_citation_update(citation_data, publications)
+            meta['cite_update'] = newest_citation_update(citation_data, publications)
 
         if 'stats' in options and options['stats']:
             meta['publications'] = len(publications)
@@ -953,6 +953,23 @@ def oldest_citation_update(citation_data, publications):
                 cite_update = last_fetch
 
             if last_fetch < cite_update:
+                cite_update = last_fetch
+
+    return cite_update
+
+
+def newest_citation_update(citation_data, publications):
+    cite_update = None
+    for pub in publications:
+        current_citation_data = get_citation_data(citation_data=citation_data,
+                                                  title=pub['title'],
+                                                  year=pub['year'])
+        if current_citation_data and 'last_update' in current_citation_data:
+            last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+            if not cite_update:
+                cite_update = last_fetch
+
+            if last_fetch > cite_update:
                 cite_update = last_fetch
 
     return cite_update
