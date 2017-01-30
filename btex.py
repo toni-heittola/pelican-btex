@@ -651,10 +651,10 @@ def get_default_item_template(options):
                                 <a href="{{item.pdf}}" class="btn btn-xs btn-warning" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
                             {% endif %}
                             {% if item.demo %}
-                                <a href="{{item.demo}}" class="btn btn-xs btn-primary iframeDemo" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                                <a href="{{item.demo}}" class="btn btn-xs btn-primary iframeDemo" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>
                             {% endif %}
                             {% if item.toolbox %}
-                                <a href="{{item.toolbox}}" class="btn btn-xs btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>
+                                <a href="{{item.toolbox}}" class="btn btn-xs btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i></a>
                             {% endif %}
                             {% if item.data1 %}
                                 <a href="{{item.data1.url}}" class="btn btn-xs btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
