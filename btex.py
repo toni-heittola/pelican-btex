@@ -633,7 +633,7 @@ def get_default_item_template(options):
             <span class="label label-default" style="padding-top:0.4em;margin-left:0em;margin-top:0em;">Publication</span>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-xs-9">
+                    <div class="col-md-9">
                         <p style="text-align:left">
                         {{item.text}}
                         {% if item.award %}<span class="label label-success">{{item.award}}</span>{% endif %}
@@ -644,7 +644,7 @@ def get_default_item_template(options):
                         {% endif %}
                         </p>
                     </div>
-                    <div class="col-xs-3">
+                    <div class="col-md-3">
                         <div class="btn-group pull-right">
                             <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#bibtex{{ item.key }}"><i class="fa fa-file-text-o"></i> Bib</button>
                             {% if item.pdf %}
