@@ -630,7 +630,7 @@ def get_default_item_template(options):
     template = ''
     template += """
         <div class="panel panel-default">
-            <span class="label label-default" style="padding-top:0.4em;margin-left:0em;margin-top:0em;">Publication</span>
+            <span class="label label-default" style="padding-top:0.4em;margin-left:0em;margin-top:0em;">Publication<a name="{{ item.key }}"></a></span>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-9">
