@@ -626,90 +626,199 @@ def get_default_template(options):
         """
     return template
 
+def get_default_item_template(options):
+    template = ''
+    template += """
+        <div class="panel panel-default">
+            <span class="label label-default" style="padding-top:0.4em;margin-left:0em;margin-top:0em;">Publication</span>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <p style="text-align:left">
+                        {{item.text}}
+                        {% if item.award %}<span class="label label-success">{{item.award}}</span>{% endif %}
+                        {% if item.cites %}
+                        <span style="padding-left:5px">
+                        <span title="Number of citations" class="badge">{{ item.cites }} {% if item.cites==1 %}cite{% else %}cites{% endif %}</span>
+                        </span>
+                        {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-xs-3">
+                        <div class="btn-group pull-right">
+                            <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#bibtex{{ item.key }}"><i class="fa fa-file-text-o"></i> Bib</button>
+                            {% if item.pdf %}
+                                <a href="{{item.pdf}}" class="btn btn-xs btn-warning" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                            {% endif %}
+                            {% if item.demo %}
+                                <a href="{{item.demo}}" class="btn btn-xs btn-primary iframeDemo" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                            {% endif %}
+                            {% if item.toolbox %}
+                                <a href="{{item.toolbox}}" class="btn btn-xs btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>
+                            {% endif %}
+                            {% if item.data1 %}
+                                <a href="{{item.data1.url}}" class="btn btn-xs btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
+                            {% endif %}
+                            {% if item.data2 %}
+                                <a href="{{item.data2.url}}" class="btn btn-xs btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
+                            {% endif %}
+                            <button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ item.key }}" aria-expanded="true" aria-controls="collapse{{ item.key }}">
+                                <i class="fa fa-caret-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-def btex_parse(content):
+                <div id="collapse{{ item.key }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading{{ item.key }}">
+                    <h4>{{item.title}}</h4>
+                    {% if item.abstract %}
+                        <h5>Abstract</h5>
+                        <p class="text-justify">{{item.abstract}}</p>
+                    {% endif %}
+                    {% if item.keywords %}
+                        <h5>Keywords</h5>
+                        <p class="text-justify">{{item.keywords}}</p>
+                    {% endif %}
+                    {% if item.award %}
+                        <p><strong>Awards:</strong> {{item.award}}</p>
+                    {% endif %}
+                    {% if item.cites %}
+                        <p><strong>Cites:</strong> {{item.cites}} (<a href="{{ item.citation_url }}" target="_blank">see at Google Scholar</a>)</p>
+                    {% endif %}
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#bibtex{{ item.key }}"><i class="fa fa-file-text-o"></i> Bibtex</button>
+                        {% if item.pdf %}
+                            <a href="{{item.pdf}}" class="btn btn-sm btn-warning" style="text-decoration:none;border-bottom:0;padding-bottom:9px" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                        {% endif %}
+                        {% if item.slides %}
+                            <a href="{{item.slides}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>
+                        {% endif %}
+                        {% if item.webpublication %}
+                            <a href="{{item.webpublication.url}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>
+                        {% endif %}
+                    </div>
+                    <div class="btn-group">
+                    {% if item.toolbox %}
+                        <a href="{{item.toolbox}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>
+                    {% endif %}
+                    {% if item.data1 %}
+                        <a href="{{item.data1.url}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>
+                    {% endif %}
+                    {% if item.data2 %}
+                        <a href="{{item.data2.url}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>
+                    {% endif %}
+                    {% if item.code1 %}
+                        <a href="{{item.code1.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.code1.title}}"><i class="fa fa-file-code-o"></i> {{item.code1.title}}</a>
+                    {% endif %}
+                    {% if item.code2 %}
+                        <a href="{{item.code2.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.code2.title}}"><i class="fa fa-file-code-o"></i> {{item.code2.title}}</a>
+                    {% endif %}
+                    {% if item.demo %}
+                        <a href="{{item.demo}}" class="btn btn-sm btn-primary iframeDemo" style="text-decoration:none;border-bottom:0;padding-bottom:9px" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                    {% endif %}
+                    {% if item.link1 %}
+                        <a href="{{item.link1.url}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>
+                    {% endif %}
+                    {% if item.link2 %}
+                        <a href="{{item.link2.url}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>
+                    {% endif %}
+                    {% if item.link3 %}
+                        <a href="{{item.link3.url}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>
+                    {% endif %}
+                    {% if item.link4 %}
+                        <a href="{{item.link4.url}}" class="btn btn-sm btn-info" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="bibtex{{item.key}}" tabindex="-1" role="dialog" aria-labelledby="bibtex{{item.key}}label" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="bibtex{{item.key}}label">{{item.title}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <pre>{{item.bibtex}}</pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """
+    return template
+
+
+def search(key, publications):
+    return [element for element in publications if element['key'] == key]
+
+
+def btex(content):
     if isinstance(content, contents.Static):
         return
-
+    google_queries = 0
     soup = BeautifulSoup(content._content, 'html.parser')
     btex_divs = soup.find_all('div', class_='btex')
+    btex_item_divs = soup.find_all('div', class_='btex-item')
+    if btex_item_divs:
+        for btex_item_div in btex_item_divs:
+            options = {}
+            options['css'] = btex_item_div['class']
 
-    for btex_div in btex_divs:
-        options = {}
-        options['css'] = btex_div['class']
+            options['data_source'] = get_attribute(btex_item_div.attrs, 'source', None)
+            options['citations'] = get_attribute(btex_item_div.attrs, 'citations', 'btex_citation_cache.yaml')
+            citation_data = load_citation_data(filename=options['citations'])
 
-        options['data_source'] = get_attribute(btex_div.attrs, 'source', None)
-        options['citations'] = get_attribute(btex_div.attrs, 'citations', 'btex_citation_cache.yaml')
+            options['item'] = get_attribute(btex_item_div.attrs, 'item', None)
+            options['scholar-cite-counts'] = boolean(get_attribute(btex_item_div.attrs, 'scholar-cite-counts', 'no'))
+            options['scholar-link'] = get_attribute(btex_item_div.attrs, 'scholar-link', None)
+            options['target_page'] = get_attribute(btex_item_div.attrs, 'target-page', None)
 
-        citation_data = load_citation_data(filename=options['citations'])
-        options['template'] = get_attribute(btex_div.attrs, 'template', 'publications')
+            publications = parse_bibtex_file(options['data_source'])
+            item_data = search(key=options['item'] , publications=publications)
+            if item_data:
+                item_data = item_data[0]
 
-        options['years'] = get_attribute(btex_div.attrs, 'years', None)
-        options['scholar-cite-counts'] = boolean(get_attribute(btex_div.attrs, 'scholar-cite-counts', 'no'))
-        options['scholar-link'] = get_attribute(btex_div.attrs, 'scholar-link', None)
+            if item_data:
+                meta = {}
+                if 'scholar-cite-counts' in options and options['scholar-cite-counts']:
+                    google_access_valid = btex_settings['google_scholar']['active']
+                    current_timestamp = time.time()
+                    if google_access_valid:
+                        try:
+                            import scholar.scholar as sc
+                        except ImportError:
+                            logger.warning('`pelican_btex` failed to import `scholar`')
 
-        options['stats'] = boolean(get_attribute(btex_div.attrs, 'stats', 'no'))
+                        citation_update_needed = False
+                        citation_update_count = 0
 
-        options['target_page'] = get_attribute(btex_div.attrs, 'target-page', None)
-
-        if options['years']:
-            options['first_visible_year'] = int(datetime.now().strftime('%Y')) - int(options['years'])
-        else:
-            options['first_visible_year'] = ''
-        publications = parse_bibtex_file(options['data_source'])
-
-        meta = {}
-        if 'scholar-cite-counts' in options and options['scholar-cite-counts']:
-            google_queries = 0
-            google_access_valid = btex_settings['google_scholar']['active']
-            current_timestamp = time.time()
-            if google_access_valid:
-                try:
-                    import scholar.scholar as sc
-                except ImportError:
-                    logger.warning('`pelican_btex` failed to import `scholar`')
-
-                citation_update_needed = False
-                citation_update_count = 0
-                for pub in publications:
-                    current_citation_data = get_citation_data(citation_data, pub['title'], pub['year'])
-                    if current_citation_data:
-                        last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
-                        if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
+                        current_citation_data = get_citation_data(citation_data, item_data['title'], item_data['year'])
+                        if current_citation_data:
+                            last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+                            if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
+                                citation_update_needed = True
+                                citation_update_count += 1
+                        else:
                             citation_update_needed = True
                             citation_update_count += 1
-                    else:
-                        citation_update_needed = True
-                        citation_update_count += 1
 
-                # Update citations before injecting them to the publication list
-                if citation_update_needed:
-                    logger.warning(" Citation update needed for articles: " + str(citation_update_count))
-                    # Go publications through paper by paper
-                    for pub in publications:
-                        if google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
-                            # Check can we query google, as we
-                            # only update specified amount of entries (to avoid filling google access quota) with
-                            # specified time intervals
-                            current_citation_data = get_citation_data(citation_data=citation_data, title=pub['title'], year=pub['year'])
-                            citation_update_needed = False
-                            if current_citation_data:
-                                last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'],'%Y-%m-%d %H:%M:%S').timetuple())
-
-                                if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
-                                    citation_update_needed = True
-                            else:
-                                # We have a new article
-                                citation_update_needed = True
-
-                            if citation_update_needed:
+                        # Update citations before injecting them to the publication list
+                        if citation_update_needed:
+                            logger.warning(" Citation update needed for articles: " + str(citation_update_count))
+                            # Go publications through paper by paper
+                            if google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
                                 # Fetch article from google
                                 # print "  Query publication ["+pub['title']+"]"
-                                logger.warning("  Query publication [" + pub['title'] + "]")
+                                logger.warning("  Query publication [" + item_data['title'] + "]")
 
                                 # Form author list
                                 authors = []
-                                for author in pub['authors']:
+                                for author in item_data['authors']:
                                     authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
                                 authors = ", ".join(authors)
                                 querier = sc.ScholarQuerier()
@@ -718,18 +827,23 @@ def btex_parse(content):
 
                                 query = sc.SearchScholarQuery()
                                 query.set_author(authors.split(',')[0])  # Authors
-                                query.set_phrase(pub['title'])  # Title
+                                query.set_phrase(item_data['title'])  # Title
                                 query.set_scope(True)  # Title only
                                 query.set_num_page_results(1)
 
                                 querier.send_query(query)
                                 google_queries += 1
                                 if len(querier.articles):
-                                    update_citation_data(citation_data=citation_data, new_data=querier.articles[0].attrs, title=pub['title'], year=pub['year'], insert_new=True)
-                                    logger.warning("    Cites: "+str(querier.articles[0].attrs['num_citations'][0]))
+                                    update_citation_data(citation_data=citation_data,
+                                                         new_data=querier.articles[0].attrs, title=item_data['title'],
+                                                         year=item_data['year'], insert_new=True)
+                                    logger.warning(
+                                        "    Cites: " + str(querier.articles[0].attrs['num_citations'][0]))
                                 else:
-                                    update_citation_data_empty(citation_data=citation_data, title=pub['title'], year=pub['year'])
-                                    logger.warning("    Nothing returned, article might not be indexed by Google or your access quota is exceeded! ")
+                                    update_citation_data_empty(citation_data=citation_data, title=item_data['title'],
+                                                               year=item_data['year'])
+                                    logger.warning(
+                                        "    Nothing returned, article might not be indexed by Google or your access quota is exceeded! ")
 
                                 save_citation_data(filename=options['citations'], citation_data=citation_data)
                                 # Wait after each query random time in order to avoid flooding Google.
@@ -737,108 +851,244 @@ def btex_parse(content):
                                                     btex_settings['google_scholar']['fetch_item_timeout'][1])
                                 print "  Sleeping [" + str(wait_time) + " sec]"
                                 sleep(wait_time)
+                    # Inject citation information to the publication list
+                    current_citation_data = get_citation_data(citation_data=citation_data,
+                                                              title=item_data['title'],
+                                                              year=item_data['year'])
+                    if current_citation_data and 'scholar' in current_citation_data and 'total_citations' in current_citation_data['scholar']:
+                        item_data['cites'] = current_citation_data['scholar']['total_citations']
+                    else:
+                        item_data['cites'] = 0
 
-            # Inject citation information to the publication list
-            for pub in publications:
-                current_citation_data = get_citation_data(citation_data=citation_data,
-                                                          title=pub['title'],
-                                                          year=pub['year'])
-                if current_citation_data and 'scholar' in current_citation_data and 'total_citations' in current_citation_data['scholar']:
-                    pub['cites'] = current_citation_data['scholar']['total_citations']
-                else:
-                    pub['cites'] = 0
+                    if current_citation_data and 'scholar' in current_citation_data and 'citation_list_url' in current_citation_data['scholar']:
+                        item_data['citation_url'] = current_citation_data['scholar']['citation_list_url']
+                    else:
+                        item_data['citation_url'] = None
 
-                if current_citation_data and 'scholar' in current_citation_data and 'citation_list_url' in current_citation_data['scholar']:
-                    pub['citation_url'] = current_citation_data['scholar']['citation_list_url']
-                else:
-                    pub['citation_url'] = None
+                meta['cite_update'] = newest_citation_update(citation_data, publications)
 
-            meta['cite_update'] = newest_citation_update(citation_data, publications)
+                div_text = btex_item_div.text
+                div_text = div_text.rstrip('\r\n').replace(" ", "")
+                has_template = False
+                if len(div_text):
+                    has_template = True
 
-        if 'stats' in options and options['stats']:
-            meta['publications'] = len(publications)
-            meta['pubs_per_year'] = get_publications_per_year(publications)
-            meta['cites_per_year'] = get_cites_per_year(publications)
-            if options['scholar-cite-counts']:
-                meta['cites'] = 0
+                if not has_template:
+                    btex_item_div.string = get_default_item_template(options)
+
+                template = Template(btex_item_div.prettify().strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
+
+                div_html = BeautifulSoup(template.render(item=item_data,
+                                                         meta=meta,
+                                                         target_page=options['target_page']
+                                                         ), "html.parser")
+                btex_item_div.replaceWith(div_html)
+
+    if btex_divs:
+        for btex_div in btex_divs:
+            options = {}
+            options['css'] = btex_div['class']
+
+            options['data_source'] = get_attribute(btex_div.attrs, 'source', None)
+            options['citations'] = get_attribute(btex_div.attrs, 'citations', 'btex_citation_cache.yaml')
+
+            citation_data = load_citation_data(filename=options['citations'])
+            options['template'] = get_attribute(btex_div.attrs, 'template', 'publications')
+
+            options['years'] = get_attribute(btex_div.attrs, 'years', None)
+            options['scholar-cite-counts'] = boolean(get_attribute(btex_div.attrs, 'scholar-cite-counts', 'no'))
+            options['scholar-link'] = get_attribute(btex_div.attrs, 'scholar-link', None)
+
+            options['stats'] = boolean(get_attribute(btex_div.attrs, 'stats', 'no'))
+
+            options['target_page'] = get_attribute(btex_div.attrs, 'target-page', None)
+
+            if options['years']:
+                options['first_visible_year'] = int(datetime.now().strftime('%Y')) - int(options['years'])
+            else:
+                options['first_visible_year'] = ''
+            publications = parse_bibtex_file(options['data_source'])
+
+            meta = {}
+            if 'scholar-cite-counts' in options and options['scholar-cite-counts']:
+                google_access_valid = btex_settings['google_scholar']['active']
+                current_timestamp = time.time()
+                if google_access_valid:
+                    try:
+                        import scholar.scholar as sc
+                    except ImportError:
+                        logger.warning('`pelican_btex` failed to import `scholar`')
+
+                    citation_update_needed = False
+                    citation_update_count = 0
+                    for pub in publications:
+                        current_citation_data = get_citation_data(citation_data, pub['title'], pub['year'])
+                        if current_citation_data:
+                            last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+                            if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
+                                citation_update_needed = True
+                                citation_update_count += 1
+                        else:
+                            citation_update_needed = True
+                            citation_update_count += 1
+
+                    # Update citations before injecting them to the publication list
+                    if citation_update_needed:
+                        logger.warning(" Citation update needed for articles: " + str(citation_update_count))
+                        # Go publications through paper by paper
+                        for pub in publications:
+                            if google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
+                                # Check can we query google, as we
+                                # only update specified amount of entries (to avoid filling google access quota) with
+                                # specified time intervals
+                                current_citation_data = get_citation_data(citation_data=citation_data, title=pub['title'], year=pub['year'])
+                                citation_update_needed = False
+                                if current_citation_data:
+                                    last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'],'%Y-%m-%d %H:%M:%S').timetuple())
+
+                                    if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
+                                        citation_update_needed = True
+                                else:
+                                    # We have a new article
+                                    citation_update_needed = True
+
+                                if citation_update_needed:
+                                    # Fetch article from google
+                                    # print "  Query publication ["+pub['title']+"]"
+                                    logger.warning("  Query publication [" + pub['title'] + "]")
+
+                                    # Form author list
+                                    authors = []
+                                    for author in pub['authors']:
+                                        authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
+                                    authors = ", ".join(authors)
+                                    querier = sc.ScholarQuerier()
+                                    settings = sc.ScholarSettings()
+                                    querier.apply_settings(settings)
+
+                                    query = sc.SearchScholarQuery()
+                                    query.set_author(authors.split(',')[0])  # Authors
+                                    query.set_phrase(pub['title'])  # Title
+                                    query.set_scope(True)  # Title only
+                                    query.set_num_page_results(1)
+
+                                    querier.send_query(query)
+                                    google_queries += 1
+                                    if len(querier.articles):
+                                        update_citation_data(citation_data=citation_data, new_data=querier.articles[0].attrs, title=pub['title'], year=pub['year'], insert_new=True)
+                                        logger.warning("    Cites: "+str(querier.articles[0].attrs['num_citations'][0]))
+                                    else:
+                                        update_citation_data_empty(citation_data=citation_data, title=pub['title'], year=pub['year'])
+                                        logger.warning("    Nothing returned, article might not be indexed by Google or your access quota is exceeded! ")
+
+                                    save_citation_data(filename=options['citations'], citation_data=citation_data)
+                                    # Wait after each query random time in order to avoid flooding Google.
+                                    wait_time = randint(btex_settings['google_scholar']['fetch_item_timeout'][0],
+                                                        btex_settings['google_scholar']['fetch_item_timeout'][1])
+                                    print "  Sleeping [" + str(wait_time) + " sec]"
+                                    sleep(wait_time)
+
+                # Inject citation information to the publication list
                 for pub in publications:
-                    if 'cites' in pub:
-                        meta['cites'] += pub['cites']
-            author_list = []
-            type_stats = {}
-            for pub in publications:
-                for author in pub['authors']:
-                    author_name = " ".join(author.first()) + " " + " ".join(author.last())
-                    if author_name not in author_list:
-                        author_list.append(author_name)
-                if pub['type_label'] not in type_stats:
-                    type_stats[pub['type_label']] = 0
-                type_stats[pub['type_label']] += 1
-            meta['unique_authors'] = len(author_list)
-            meta['types'] = type_stats
+                    current_citation_data = get_citation_data(citation_data=citation_data,
+                                                              title=pub['title'],
+                                                              year=pub['year'])
+                    if current_citation_data and 'scholar' in current_citation_data and 'total_citations' in current_citation_data['scholar']:
+                        pub['cites'] = current_citation_data['scholar']['total_citations']
+                    else:
+                        pub['cites'] = 0
 
-            group_stat = []
-            for group_id in btex_publication_grouping:
-                group_data = btex_publication_grouping[group_id]
-                if group_data['label'] in type_stats:
-                    group_stat.append('<em>'+group_data['name'] + '</em> : ' + str(type_stats[group_data['label']]))
-            meta['types_html_list'] = ", ".join(group_stat)
+                    if current_citation_data and 'scholar' in current_citation_data and 'citation_list_url' in current_citation_data['scholar']:
+                        pub['citation_url'] = current_citation_data['scholar']['citation_list_url']
+                    else:
+                        pub['citation_url'] = None
 
-            if 'cite_update' in meta:
-                meta['cite_update_string'] = format(datetime.fromtimestamp(meta['cite_update']), '%d.%m.%Y')
-        div_text = btex_div.text
-        div_text = div_text.rstrip('\r\n').replace(" ", "")
-        has_template = False
-        if len(div_text):
-            has_template = True
+                meta['cite_update'] = newest_citation_update(citation_data, publications)
 
-        if not has_template:
-            btex_div.string = get_default_template(options)
+            if 'stats' in options and options['stats']:
+                meta['publications'] = len(publications)
+                meta['pubs_per_year'] = get_publications_per_year(publications)
+                meta['cites_per_year'] = get_cites_per_year(publications)
+                if options['scholar-cite-counts']:
+                    meta['cites'] = 0
+                    for pub in publications:
+                        if 'cites' in pub:
+                            meta['cites'] += pub['cites']
+                author_list = []
+                type_stats = {}
+                for pub in publications:
+                    for author in pub['authors']:
+                        author_name = " ".join(author.first()) + " " + " ".join(author.last())
+                        if author_name not in author_list:
+                            author_list.append(author_name)
+                    if pub['type_label'] not in type_stats:
+                        type_stats[pub['type_label']] = 0
+                    type_stats[pub['type_label']] += 1
+                meta['unique_authors'] = len(author_list)
+                meta['types'] = type_stats
 
-        template = Template(btex_div.prettify().strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
+                group_stat = []
+                for group_id in btex_publication_grouping:
+                    group_data = btex_publication_grouping[group_id]
+                    if group_data['label'] in type_stats:
+                        group_stat.append('<em>'+group_data['name'] + '</em> : ' + str(type_stats[group_data['label']]))
+                meta['types_html_list'] = ", ".join(group_stat)
 
-        div_html = BeautifulSoup(template.render(publications=publications,
-                                                 meta=meta,
-                                                 publication_grouping=btex_publication_grouping,
-                                                 first_visible_year=options['first_visible_year'],
-                                                 target_page=options['target_page']
-                                                 ), "html.parser")
-        btex_div.replaceWith(div_html)
+                if 'cite_update' in meta:
+                    meta['cite_update_string'] = format(datetime.fromtimestamp(meta['cite_update']), '%d.%m.%Y')
+            div_text = btex_div.text
+            div_text = div_text.rstrip('\r\n').replace(" ", "")
+            has_template = False
+            if len(div_text):
+                has_template = True
 
-    if btex_settings['minified']:
-        html_elements = {
-            'js_include': [
-                '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.min.js"></script>'
-            ],
-            'css_include': [
-            #    '<link rel="stylesheet" href="theme/css/btex.min.css">'
-            ]
-        }
-    else:
-        html_elements = {
-            'js_include': [
-                '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.js"></script>'
-            ],
-            'css_include': [
-            #    '<link rel="stylesheet" href="theme/css/btex.css">'
-            ]
-        }
-    if btex_settings['use_fontawesome_cdn']:
-        html_elements['css_include'].append(
-            '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">'
-        )
+            if not has_template:
+                btex_div.string = get_default_template(options)
 
-    if u'scripts' not in content.metadata:
-        content.metadata[u'scripts'] = []
-    for element in html_elements['js_include']:
-        if element not in content.metadata[u'scripts']:
-            content.metadata[u'scripts'].append(element)
+            template = Template(btex_div.prettify().strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
 
-    if u'styles' not in content.metadata:
-        content.metadata[u'styles'] = []
-    for element in html_elements['css_include']:
-        if element not in content.metadata[u'styles']:
-            content.metadata[u'styles'].append(element)
+            div_html = BeautifulSoup(template.render(publications=publications,
+                                                     meta=meta,
+                                                     publication_grouping=btex_publication_grouping,
+                                                     first_visible_year=options['first_visible_year'],
+                                                     target_page=options['target_page']
+                                                     ), "html.parser")
+            btex_div.replaceWith(div_html)
+
+        if btex_settings['minified']:
+            html_elements = {
+                'js_include': [
+                    '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.min.js"></script>'
+                ],
+                'css_include': [
+                #    '<link rel="stylesheet" href="theme/css/btex.min.css">'
+                ]
+            }
+        else:
+            html_elements = {
+                'js_include': [
+                    '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.js"></script>'
+                ],
+                'css_include': [
+                #    '<link rel="stylesheet" href="theme/css/btex.css">'
+                ]
+            }
+        if btex_settings['use_fontawesome_cdn']:
+            html_elements['css_include'].append(
+                '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">'
+            )
+
+        if u'scripts' not in content.metadata:
+            content.metadata[u'scripts'] = []
+        for element in html_elements['js_include']:
+            if element not in content.metadata[u'scripts']:
+                content.metadata[u'scripts'].append(element)
+
+        if u'styles' not in content.metadata:
+            content.metadata[u'styles'] = []
+        for element in html_elements['css_include']:
+            if element not in content.metadata[u'styles']:
+                content.metadata[u'styles'].append(element)
 
     content._content = soup.decode()
 
@@ -1134,8 +1384,8 @@ def init_default_config(pelican):
 
 def register():
     signals.initialized.connect(init_default_config)
-    signals.content_object_init.connect(btex_parse)
     signals.article_generator_context.connect(process_page_metadata)
     signals.page_generator_context.connect(process_page_metadata)
 
     signals.article_generator_finalized.connect(move_resources)
+    signals.content_object_init.connect(btex)
