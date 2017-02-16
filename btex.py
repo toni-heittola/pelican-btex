@@ -8,7 +8,6 @@ Pelican plugin to produce publication lists automatically from BibTeX-file.
 
 """
 
-from IPython import embed
 from pelican import signals, contents
 from bs4 import BeautifulSoup
 from jinja2 import Template
