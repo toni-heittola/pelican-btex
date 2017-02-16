@@ -9,7 +9,6 @@ from pybtex.style.template import (
     names, sentence, tag, optional_field, href
 )
 from pybtex.richtext import Text, Symbol
-from IPython import embed
 
 
 def dashify(text):
