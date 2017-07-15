@@ -308,6 +308,7 @@ def get_default_template(options):
         template += '</div></div>'
 
     if options['template'] == 'publications':
+
         template += """
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
@@ -440,6 +441,7 @@ def get_default_template(options):
         </div>
         """
     elif options['template'] == 'latest':
+
         template += """
     {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
         {% if (year|int)>(first_visible_year|int) %}
@@ -503,6 +505,7 @@ def get_default_template(options):
     {% endfor %}
         """
     elif options['template'] == 'supervisions':
+
         template += """
     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
         {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
@@ -600,30 +603,59 @@ def get_default_template(options):
     </div>
         """
     elif options['template'] == 'minimal':
+
         template += """
             {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                <strong class="text-muted">{{year}}</strong>
-                {% for item in year_group|sort(attribute='year') %}
-                    <div class="row">
-                        <div class="col-md-1">
-                            <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
+                {% if (year|int)>(first_visible_year|int) %}
+                    <strong class="text-muted">{{year}}</strong>
+                    {% for item in year_group|sort(attribute='year') %}
+                        <div class="row">
+                            <div class="col-md-1 col-sm-2">
+                                <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
+                            </div>
+                            <div class="col-md-11 col-sm-10">
+                                <p style="text-align:left">{{item.text}}
+                                {% if item.award %}<span class="label label-success">{{item.award}}</span>{% endif %}
+                                {% if item.cites %}
+                                <span title="Number of citations" class="badge">{{ item.cites }} {% if item.cites==1 %}cite{% else %}cites{% endif %}</span>
+                                {% endif %}
+                                {% if item.pdf %}
+                                    <a href="{{item.pdf}}" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Download pdf" data-placement="bottom"><span class="glyphicon glyphicon-file"></span></a>
+                                {% endif %}
+                                </p>
+                            </div>
                         </div>
-                        <div class="col-md-11">
-                            <p style="text-align:left">{{item.text}}
-                            {% if item.award %}<span class="label label-success">{{item.award}}</span>{% endif %}
-                            {% if item.cites %}
-                            <span title="Number of citations" class="badge">{{ item.cites }} {% if item.cites==1 %}cite{% else %}cites{% endif %}</span>
-                            {% endif %}
-                            {% if item.pdf %}
-                                <a href="{{item.pdf}}" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Download pdf" data-placement="bottom"><span class="glyphicon glyphicon-file"></span></a>
-                            {% endif %}
-                            </p>
-                        </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% endif %}
             {% endfor %}
         """
+    elif options['template'] == 'news':
+        template += """
+        <div class="list-group btex-news-container">
+        {% for item in publications %}
+            {% if loop.index <= item_count %}
+            <a class="list-group-item" href="{{target_page}}#{{item.key}}" title="Read more...">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4 class="list-group-item-heading">{{item.title}}</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-2">
+                        <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
+                    </div>
+                    <div class="col-xs-10">
+                        <span class="authors">{{item.authors_text}}</span>
+                    </div>
+                </div>
+            </a>
+            {% endif %}
+        {% endfor %}
+        </div>
+        """
+
     return template
+
 
 def get_default_item_template(options):
     template = ''
@@ -895,6 +927,8 @@ def btex(content):
             options['template'] = get_attribute(btex_div.attrs, 'template', 'publications')
 
             options['years'] = get_attribute(btex_div.attrs, 'years', None)
+            options['item_count'] = get_attribute(btex_div.attrs, 'item-count', None)
+
             options['scholar-cite-counts'] = boolean(get_attribute(btex_div.attrs, 'scholar-cite-counts', 'no'))
             options['scholar-link'] = get_attribute(btex_div.attrs, 'scholar-link', None)
 
@@ -906,6 +940,7 @@ def btex(content):
                 options['first_visible_year'] = int(datetime.now().strftime('%Y')) - int(options['years'])
             else:
                 options['first_visible_year'] = ''
+
             publications = parse_bibtex_file(options['data_source'])
 
             meta = {}
@@ -1046,10 +1081,16 @@ def btex(content):
 
             template = Template(btex_div.prettify().strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
 
+            if not options['item_count']:
+                options['item_count'] = len(publications)
+            else:
+                options['item_count'] = int(options['item_count'])
+
             div_html = BeautifulSoup(template.render(publications=publications,
                                                      meta=meta,
                                                      publication_grouping=btex_publication_grouping,
                                                      first_visible_year=options['first_visible_year'],
+                                                     item_count=options['item_count'],
                                                      target_page=options['target_page']
                                                      ), "html.parser")
             btex_div.replaceWith(div_html)
@@ -1060,7 +1101,7 @@ def btex(content):
                     '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.min.js"></script>'
                 ],
                 'css_include': [
-                #    '<link rel="stylesheet" href="theme/css/btex.min.css">'
+                    '<link rel="stylesheet" href="' + btex_settings['site-url'] + '/theme/css/btex.min.css">'
                 ]
             }
         else:
@@ -1069,9 +1110,10 @@ def btex(content):
                     '<script type="text/javascript" src="'+btex_settings['site-url']+'/theme/js/btex.js"></script>'
                 ],
                 'css_include': [
-                #    '<link rel="stylesheet" href="theme/css/btex.css">'
+                    '<link rel="stylesheet" href="' + btex_settings['site-url'] + '/theme/css/btex.css">'
                 ]
             }
+
         if btex_settings['use_fontawesome_cdn']:
             html_elements['css_include'].append(
                 '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">'
@@ -1268,43 +1310,47 @@ def move_resources(gen):
     plugin_paths = gen.settings['PLUGIN_PATHS']
     if btex_settings['minified']:
         if btex_settings['generate_minified']:
-            #minify_css_directory(gen=gen, source='css', target='css.min')
+            minify_css_directory(gen=gen, source='css', target='css.min')
             minify_js_directory(gen=gen, source='js', target='js.min')
 
-        #css_target = os.path.join(gen.output_path, 'theme', 'css', 'btex.min.css')
+        css_target = os.path.join(gen.output_path, 'theme', 'css', 'btex.min.css')
         js_target = os.path.join(gen.output_path, 'theme', 'js', 'btex.min.js')
         if not os.path.exists(os.path.join(gen.output_path, 'theme', 'js')):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
 
+        if not os.path.exists(os.path.join(gen.output_path, 'theme', 'css')):
+            os.makedirs(os.path.join(gen.output_path, 'theme', 'css'))
+
         for path in plugin_paths:
-            #css_source = os.path.join(path, 'pelican-btex', 'css.min', 'btex.min.css')
+            css_source = os.path.join(path, 'pelican-btex', 'css.min', 'btex.min.css')
             js_source = os.path.join(path, 'pelican-btex', 'js.min', 'btex.min.js')
 
-            #if os.path.isfile(css_source):  # and not os.path.isfile(css_target):
-            #    shutil.copyfile(css_source, css_target)
+            if os.path.isfile(css_source):  # and not os.path.isfile(css_target):
+                shutil.copyfile(css_source, css_target)
 
             if os.path.isfile(js_source):  # and not os.path.isfile(js_target):
                 shutil.copyfile(js_source, js_target)
 
-            if os.path.isfile(js_target): # and os.path.isfile(css_target):
+            if os.path.isfile(js_target) and os.path.isfile(css_target):
                break
+
     else:
-        #css_target = os.path.join(gen.output_path, 'theme', 'css', 'btex.css')
+        css_target = os.path.join(gen.output_path, 'theme', 'css', 'btex.css')
         js_target = os.path.join(gen.output_path, 'theme', 'js', 'btex.js')
         if not os.path.exists(os.path.join(gen.output_path, 'theme', 'js')):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
 
         for path in plugin_paths:
-            #css_source = os.path.join(path, 'pelican-btex', 'css', 'btex.css')
+            css_source = os.path.join(path, 'pelican-btex', 'css', 'btex.css')
             js_source = os.path.join(path, 'pelican-btex', 'js', 'btex.js')
 
-            #if os.path.isfile(css_source):  # and not os.path.isfile(css_target):
-            #    shutil.copyfile(css_source, css_target)
+            if os.path.isfile(css_source):  # and not os.path.isfile(css_target):
+                shutil.copyfile(css_source, css_target)
 
             if os.path.isfile(js_source):  # and not os.path.isfile(js_target):
                 shutil.copyfile(js_source, js_target)
 
-            if os.path.isfile(js_target): # and os.path.isfile(css_target):
+            if os.path.isfile(js_target) and os.path.isfile(css_target):
                 break
 
 
