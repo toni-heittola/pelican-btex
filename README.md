@@ -124,6 +124,7 @@ In addition to basic fields, there are some extra ones to associate information 
 - `_award`, award associated to the publication
 - `_pdf`, link to PDF associated to the publication
 - `_slides`, link to Slides associated to the publication
+- `_poster`, link to Poster associated to the publication
 - `_webpublication`, link to web publication associated to the publication
 - `_demo`, link to Demo associated to the publication
 - `_toolbox`, link to Toolbox associated to the publication
