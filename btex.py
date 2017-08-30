@@ -248,6 +248,7 @@ def parse_bibtex_file(src_filename):
 
         item['_authors'] = entry.fields.get('_authors', None)
         item['_affiliations'] = entry.fields.get('_affiliations', None)
+        item['_extra_info'] = entry.fields.get('_extra_info', None)
 
         # render the bibtex string for the entry
         bib_buf = StringIO()
