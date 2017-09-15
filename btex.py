@@ -215,6 +215,7 @@ def parse_bibtex_file(src_filename):
         item['award'] = entry.fields.get('_award', None)
         item['pdf'] = entry.fields.get('_pdf', None)
         item['demo'] = entry.fields.get('_demo', None)
+        item['demo_external'] = entry.fields.get('_demo_external', None)
         item['toolbox'] = entry.fields.get('_toolbox', None)
         item['clients'] = entry.fields.get('_clients', None)
         item['slides'] = entry.fields.get('_slides', None)
@@ -352,6 +353,9 @@ def get_default_template(options):
                                         {% if item.demo %}
                                             <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
                                         {% endif %}
+                                        {% if item.demo_external %}
+                                            <a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                                        {% endif %}
                                         {% if item.toolbox %}
                                             <a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>
                                         {% endif %}
@@ -416,6 +420,9 @@ def get_default_template(options):
                                 {% if item.demo %}
                                     <a href="{{item.demo}}" class="btn btn-sm btn-primary iframe-demo btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
                                 {% endif %}
+                                {% if item.demo_external %}
+                                    <a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                                {% endif %}
                                 {% if item.link1 %}
                                     <a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>
                                 {% endif %}
@@ -477,6 +484,9 @@ def get_default_template(options):
                             {% endif %}
                             {% if item.demo %}
                                 <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                            {% endif %}
+                            {% if item.demo_external %}
+                                <a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
                             {% endif %}
                             {% if item.toolbox %}
                                 <a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>
@@ -547,6 +557,9 @@ def get_default_template(options):
                                     {% if item.demo %}
                                         <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
                                     {% endif %}
+                                    {% if item.demo_external %}
+                                        <a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -586,6 +599,9 @@ def get_default_template(options):
                             <div class="btn-group">
                             {% if item.demo %}
                                 <a href="{{item.demo}}" class="btn btn-sm btn-primary iframe-demo btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                            {% endif %}
+                            {% if item.demo_external %}
+                                <a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
                             {% endif %}
                             {% if item.link1 %}
                                 <a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>
@@ -700,6 +716,9 @@ def get_default_item_template(options):
                             {% if item.demo %}
                                 <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>
                             {% endif %}
+                            {% if item.demo_external %}
+                                <a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>
+                            {% endif %}
                             {% if item.toolbox %}
                                 <a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i></a>
                             {% endif %}
@@ -765,6 +784,9 @@ def get_default_item_template(options):
                     {% endif %}
                     {% if item.demo %}
                         <a href="{{item.demo}}" class="btn btn-sm btn-primary iframe-demo btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
+                    {% endif %}
+                    {% if item.demo_external %}
+                        <a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
                     {% endif %}
                     {% if item.link1 %}
                         <a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>
