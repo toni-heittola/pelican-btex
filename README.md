@@ -126,6 +126,7 @@ In addition to basic fields, there are some extra ones to associate information 
 - `_slides`, link to Slides associated to the publication
 - `_webpublication`, link to web publication associated to the publication
 - `_demo`, link to Demo associated to the publication
+- `_demo_external`, link to external Demo associated to the publication
 - `_toolbox`, link to Toolbox associated to the publication
 - `_data1` and `_data2`, link to data packages associated to the publication
 - `_code1` and `_code2`, link to code packages associated to the publication
