@@ -192,6 +192,10 @@ def parse_bibtex_file(src_filename):
             item['authors_text'] = ", ".join(authors[:-1]) + " and " + authors[-1]
         else:
             item['authors_text'] = authors[0]
+        if '\\' in item['authors_text']:
+            from pylatexenc.latexwalker import LatexWalker
+            from pylatexenc.latex2text import LatexNodes2Text
+            item['authors_text'] = LatexNodes2Text().nodelist_to_text(LatexWalker(item['authors_text']).get_latex_nodes()[0])
 
         # Type fields
         item['type'] = entry_type
@@ -885,12 +889,14 @@ def btex(content):
                             if google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
                                 # Fetch article from google
                                 # print "  Query publication ["+pub['title']+"]"
-                                logger.warning("  Query publication [" + item_data['title'] + "]")
 
                                 # Form author list
                                 authors = []
                                 for author in item_data['authors']:
                                     authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
+
+                                logger.warning("  Query publication [" + authors.split(',')[0] + ': ' + item_data['title'] + "]")
+
                                 authors = ", ".join(authors)
                                 querier = sc.ScholarQuerier()
                                 settings = sc.ScholarSettings()
@@ -1029,32 +1035,43 @@ def btex(content):
                                 if citation_update_needed:
                                     # Fetch article from google
                                     # print "  Query publication ["+pub['title']+"]"
-                                    logger.warning("  Query publication [" + pub['title'] + "]")
-
                                     # Form author list
                                     authors = []
                                     for author in pub['authors']:
                                         authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
                                     authors = ", ".join(authors)
+
+                                    logger.warning("  Query publication [" + authors.split(',')[0] + ': '+ pub['title'] + "]")
+
                                     querier = sc.ScholarQuerier()
                                     settings = sc.ScholarSettings()
                                     querier.apply_settings(settings)
 
                                     query = sc.SearchScholarQuery()
-                                    #query.set_author(authors.split(',')[0])  # Authors
+                                    query.set_author(authors.split(',')[0])  # Authors
                                     query.set_phrase(pub['title'])  # Title
                                     query.set_scope(True)  # Title only
                                     query.set_num_page_results(1)
 
                                     querier.send_query(query)
-                                    #from IPython import embed
-                                    #embed()
                                     google_queries += 1
+
                                     if len(querier.articles):
-                                        update_citation_data(citation_data=citation_data, new_data=querier.articles[0].attrs, title=pub['title'], year=pub['year'], insert_new=True)
+                                        update_citation_data(
+                                            citation_data=citation_data,
+                                            new_data=querier.articles[0].attrs,
+                                            title=pub['title'],
+                                            year=pub['year'],
+                                            insert_new=True
+                                        )
                                         logger.warning("    Cites: "+str(querier.articles[0].attrs['num_citations'][0]))
+
                                     else:
-                                        update_citation_data_empty(citation_data=citation_data, title=pub['title'], year=pub['year'])
+                                        update_citation_data_empty(
+                                            citation_data=citation_data,
+                                            title=pub['title'],
+                                            year=pub['year']
+                                        )
                                         logger.warning("    Nothing returned, article might not be indexed by Google or your access quota is exceeded! ")
 
                                     save_citation_data(filename=options['citations'], citation_data=citation_data)
