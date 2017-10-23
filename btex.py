@@ -254,7 +254,9 @@ def parse_bibtex_file(src_filename):
         item['_authors'] = entry.fields.get('_authors', None)
         item['_affiliations'] = entry.fields.get('_affiliations', None)
 
+        # extra
         item['_extra_info'] = entry.fields.get('_extra_info', None)
+        item['_footnote'] = entry.fields.get('_footnote', None)
 
         # System characteristics
         item['_system_input'] = entry.fields.get('_system_input', None)
