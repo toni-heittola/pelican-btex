@@ -838,8 +838,10 @@ def get_default_item_template(options):
         <div class="row">
             <div class="col-md-9">
                 <h4>{{item.title}}</h4><a name="{{ item.key }}"></a>
-                <p>{{item._authors}}</p>
-                <p class="text-muted"><small><em>{{item._affiliations}}</em></small></p>
+                <p>
+                    {{item._authors}}<br>
+                    <span class="text-muted"><small><em>{{item._affiliations}}</em></small></span>
+                </p>                
             </div>
             <div class="col-md-3">
                 <div class="btn-group pull-right">                    
@@ -866,9 +868,11 @@ def get_default_item_template(options):
                             <i class="fa fa-git"></i>
                         </button>                                        
                     {% endif %}
+                    {% if item.abstract or item.keywords %}
                     <button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#btex-items-accordion" href="#collapse{{ item.key }}{{ uuid }}" aria-expanded="true" aria-controls="collapse{{ item.key }}{{ uuid }}">
                         <i class="fa fa-caret-down"></i>
                     </button>
+                    {% endif %}
                 </div>
             </div>            
         </div>
@@ -973,8 +977,10 @@ def get_default_item_template(options):
         <div class="row">
             <div class="col-md-9">
                 <h4>{{item.title}}</h4><a name="{{ item.key }}"></a>
-                <p>{{item._authors}}</p>
-                <p class="text-muted"><small><em>{{item._affiliations}}</em></small></p>
+                <p>
+                    {{item._authors}}<br>
+                    <span class="text-muted"><small><em>{{item._affiliations}}</em></small></span>
+                </p>
             </div>
             <div class="col-md-3">
                 <div class="btn-group pull-right">                    
@@ -996,9 +1002,11 @@ def get_default_item_template(options):
                     {% if item.data2 %}
                         <a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
                     {% endif %}
+                    {% if item.abstract or item.keywords %}
                     <button type="button" class="btn btn-default btn-xs" data-toggle="collapse" data-parent="#btex-items-accordion" href="#collapse{{ item.key }}{{ uuid }}" aria-expanded="true" aria-controls="collapse{{ item.key }}{{ uuid }}">
                         <i class="fa fa-caret-down"></i>
                     </button>
+                    {% endif %}
                 </div>
             </div>            
         </div>
@@ -1085,8 +1093,10 @@ def get_default_item_template(options):
         <div class="row">
             <div class="col-md-9">
                 <h4>{{item.title}}</h4><a name="{{ item.key }}"></a>
-                <p>{{item._authors}}</p>
-                <p class="text-muted"><small><em>{{item._affiliations}}</em></small></p>
+                <p>
+                    {{item._authors}}<br>
+                    <span class="text-muted"><small><em>{{item._affiliations}}</em></small></span>
+                </p>
             </div>
             <div class="col-md-3">
                 <div class="btn-group pull-right">                    
