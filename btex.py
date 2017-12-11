@@ -225,6 +225,7 @@ def parse_bibtex_file(src_filename):
         item['clients'] = entry.fields.get('_clients', None)
         item['slides'] = entry.fields.get('_slides', None)
         item['poster'] = entry.fields.get('_poster', None)
+        item['video'] = entry.fields.get('_video', None)
 
         item['school'] = entry.fields.get('_school', None)
         item['clients'] = entry.fields.get('_clients', None)
@@ -833,6 +834,7 @@ def get_default_item_template(options):
                 </div>
             </div>
             """
+
     elif options['template'] == 'fancy_minimal':
         template += """
         <div class="row">
@@ -849,10 +851,13 @@ def get_default_item_template(options):
                         <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
                     {% endif %}
                     {% if item.slides %}
-                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-file-o fa-1x"></i> Slides</a>
+                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-powerpoint-o fa-1x"></i> Slides</a>
                     {% endif %}
                     {% if item.poster %}
-                        <a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-file-file-o fa-1x"></i> Poster</a>
+                        <a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Poster</a>
+                    {% endif %}   
+                    {% if item.video %}
+                        <a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>
                     {% endif %}                    
                     {% if item.demo %}
                         <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>
@@ -908,6 +913,9 @@ def get_default_item_template(options):
                 {% if item.poster %}
                     <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
                 {% endif %}
+                {% if item.video %}
+                    <a href="{{item.video}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera"></i> Video</a>
+                {% endif %}                
                 {% if item.webpublication %}
                     <a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>
                 {% endif %}
@@ -978,6 +986,7 @@ def get_default_item_template(options):
             </div>
         </div>        
         """
+
     elif options['template'] == 'fancy_minimal_no_bibtex':
         template += """
         <div class="row">
@@ -995,7 +1004,13 @@ def get_default_item_template(options):
                     {% endif %}
                     {% if item.slides %}
                         <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o fa-1x"></i> Slides</a>
+                    {% endif %}
+                    {% if item.poster %}
+                        <a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Poster" data-placement="bottom"><i class="fa fa-file-picture-o fa-1x"></i> Poster</a>
                     {% endif %}                    
+                    {% if item.video %}
+                        <a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>
+                    {% endif %}                      
                     {% if item.demo %}
                         <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>
                     {% endif %}
@@ -1043,6 +1058,9 @@ def get_default_item_template(options):
                 {% endif %}
                 {% if item.poster %}
                     <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
+                {% endif %}
+                {% if item.video %}
+                    <a href="{{item.video}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera"></i> Video</a>
                 {% endif %}
                 {% if item.webpublication %}
                     <a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>
@@ -1097,6 +1115,7 @@ def get_default_item_template(options):
             </div>
         </div>    
         """
+
     elif options['template'] == 'fancy_minimal_keynote':
         template += """
         <div class="row">
@@ -1114,7 +1133,10 @@ def get_default_item_template(options):
                     {% endif %}
                     {% if item.slides %}
                         <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o fa-1x"></i> Slides</a>
-                    {% endif %}                      
+                    {% endif %}
+                    {% if item.video %}
+                        <a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>
+                    {% endif %}           
                     {% if item.demo %}
                         <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>
                     {% endif %}
@@ -1185,6 +1207,9 @@ def get_default_item_template(options):
                 {% endif %}
                 {% if item.poster %}
                     <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
+                {% endif %}
+                {% if item.video %}
+                    <a href="{{item.video}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera"></i> Video</a>
                 {% endif %}
                 {% if item.webpublication %}
                     <a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>
