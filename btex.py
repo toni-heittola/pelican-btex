@@ -847,10 +847,13 @@ def get_default_item_template(options):
                 <div class="btn-group pull-right">                    
                     {% if item.pdf %}
                         <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
-                    {% endif %}   
+                    {% endif %}
                     {% if item.slides %}
-                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o fa-1x"></i> Slides</a>
-                    {% endif %}                   
+                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-file-o fa-1x"></i> Slides</a>
+                    {% endif %}
+                    {% if item.poster %}
+                        <a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-file-file-o fa-1x"></i> Poster</a>
+                    {% endif %}                    
                     {% if item.demo %}
                         <a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>
                     {% endif %}
