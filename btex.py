@@ -848,13 +848,13 @@ def get_default_item_template(options):
             <div class="col-md-3">
                 <div class="btn-group pull-right">                    
                     {% if item.pdf %}
-                        <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                        <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>
                     {% endif %}
                     {% if item.slides %}
-                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-powerpoint-o fa-1x"></i> Slides</a>
+                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i></a>
                     {% endif %}
                     {% if item.poster %}
-                        <a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Poster</a>
+                        <a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i></a>
                     {% endif %}   
                     {% if item.video %}
                         <a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>
@@ -905,10 +905,10 @@ def get_default_item_template(options):
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#bibtex{{ item.key }}{{ uuid }}"><i class="fa fa-file-text-o"></i> Bibtex</button>
                 {% if item.pdf %}
-                    <a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                    <a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>
                 {% endif %}
                 {% if item.slides %}
-                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>
+                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>
                 {% endif %}
                 {% if item.poster %}
                     <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
@@ -1000,10 +1000,10 @@ def get_default_item_template(options):
             <div class="col-md-3">
                 <div class="btn-group pull-right">                    
                     {% if item.pdf %}
-                        <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                        <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>
                     {% endif %}
                     {% if item.slides %}
-                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o fa-1x"></i> Slides</a>
+                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Slides</a>
                     {% endif %}
                     {% if item.poster %}
                         <a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Poster" data-placement="bottom"><i class="fa fa-file-picture-o fa-1x"></i> Poster</a>
@@ -1051,10 +1051,10 @@ def get_default_item_template(options):
             {% endif %}
             <div class="btn-group">
                 {% if item.pdf %}
-                    <a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                    <a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>
                 {% endif %}
                 {% if item.slides %}
-                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>
+                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>
                 {% endif %}
                 {% if item.poster %}
                     <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
@@ -1129,10 +1129,10 @@ def get_default_item_template(options):
             <div class="col-md-3">
                 <div class="btn-group pull-right">                    
                     {% if item.pdf %}
-                        <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                        <a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>
                     {% endif %}
                     {% if item.slides %}
-                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o fa-1x"></i> Slides</a>
+                        <a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Slides</a>
                     {% endif %}
                     {% if item.video %}
                         <a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>
@@ -1200,10 +1200,10 @@ def get_default_item_template(options):
             {% endif %}
             <div class="btn-group">
                 {% if item.pdf %}
-                    <a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
+                    <a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>
                 {% endif %}
                 {% if item.slides %}
-                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>
+                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>
                 {% endif %}
                 {% if item.poster %}
                     <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
