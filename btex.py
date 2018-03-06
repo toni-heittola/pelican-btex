@@ -1594,7 +1594,7 @@ def btex(content):
                 meta['types_html_list'] = ", ".join(group_stat)
 
                 if 'cite_update' in meta:
-                    meta['cite_update_string'] = format(datetime.fromtimestamp(meta['cite_update']), '%d.%m.%Y')
+                    meta['cite_update_string'] = format(datetime.fromtimestamp(float(meta['cite_update'])), '%d.%m.%Y')
             div_text = btex_div.text
             div_text = div_text.rstrip('\r\n').replace(" ", "")
             has_template = False
