@@ -1327,7 +1327,11 @@ def btex(content):
             options['target_page'] = get_attribute(btex_item_div.attrs, 'target-page', None)
 
             publications = parse_bibtex_file(options['data_source'])
-            item_data = search(key=options['item'] , publications=publications)
+            item_data = search(
+                key=options['item'],
+                publications=publications
+            )
+
             if item_data:
                 item_data = item_data[0]
 
@@ -1339,8 +1343,9 @@ def btex(content):
                     if google_access_valid:
                         try:
                             import scholar.scholar as sc
+
                         except ImportError:
-                            logger.warning('`pelican_btex` failed to import `scholar`')
+                            logger.warning('[btex] Failed to import `scholar`')
 
                         citation_update_needed = False
                         citation_update_count = 0
@@ -1350,13 +1355,14 @@ def btex(content):
                             if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
                                 citation_update_needed = True
                                 citation_update_count += 1
+
                         else:
                             citation_update_needed = True
                             citation_update_count += 1
 
                         # Update citations before injecting them to the publication list
                         if citation_update_needed:
-                            logger.warning(" Citation update needed for articles: " + str(citation_update_count))
+                            logger.warning("[btex] Citation update needed for articles: " + str(citation_update_count))
                             # Go publications through paper by paper
                             if google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
                                 # Fetch article from google
@@ -1365,9 +1371,9 @@ def btex(content):
                                 # Form author list
                                 authors = []
                                 for author in item_data['authors']:
-                                    authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
+                                    authors.append(' '.join(author.first()) + ' ' + ' '.join(author.last()))
 
-                                logger.warning("  Query publication [" + authors.split(',')[0] + ': ' + item_data['title'] + "]")
+                                logger.warning('[btex]  Query publication [{authors}: {title}]'.format(authors=authors.split(',')[0], title=item_data['title']))
 
                                 authors = ", ".join(authors)
                                 querier = sc.ScholarQuerier()
@@ -1383,34 +1389,53 @@ def btex(content):
                                 querier.send_query(query)
                                 google_queries += 1
                                 if len(querier.articles):
-                                    update_citation_data(citation_data=citation_data,
-                                                         new_data=querier.articles[0].attrs, title=item_data['title'],
-                                                         year=item_data['year'], insert_new=True)
-                                    logger.warning(
-                                        "    Cites: " + str(querier.articles[0].attrs['num_citations'][0]))
-                                else:
-                                    update_citation_data_empty(citation_data=citation_data, title=item_data['title'],
-                                                               year=item_data['year'])
-                                    logger.warning(
-                                        "    Nothing returned, article might not be indexed by Google or your access quota is exceeded! ")
+                                    update_citation_data(
+                                        citation_data=citation_data,
+                                        new_data=querier.articles[0].attrs,
+                                        title=item_data['title'],
+                                        year=item_data['year'],
+                                        insert_new=True
+                                    )
 
-                                save_citation_data(filename=options['citations'], citation_data=citation_data)
+                                    logger.warning('[btex]    Cites [{num_citations}]'.format(str(querier.articles[0].attrs['num_citations'][0])))
+
+                                else:
+                                    update_citation_data_empty(
+                                        citation_data=citation_data,
+                                        title=item_data['title'],
+                                        year=item_data['year']
+                                    )
+
+                                    logger.warning('[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
+
+                                save_citation_data(
+                                    filename=options['citations'],
+                                    citation_data=citation_data
+                                )
+
                                 # Wait after each query random time in order to avoid flooding Google.
                                 wait_time = randint(btex_settings['google_scholar']['fetch_item_timeout'][0],
                                                     btex_settings['google_scholar']['fetch_item_timeout'][1])
-                                print "  Sleeping [" + str(wait_time) + " sec]"
+
+                                logger.warning('[btex]  Sleeping [{wait_time} sec]'.format(wait_time=str(wait_time)))
                                 sleep(wait_time)
+
                     # Inject citation information to the publication list
-                    current_citation_data = get_citation_data(citation_data=citation_data,
-                                                              title=item_data['title'],
-                                                              year=item_data['year'])
+                    current_citation_data = get_citation_data(
+                        citation_data=citation_data,
+                        title=item_data['title'],
+                        year=item_data['year']
+                    )
+
                     if current_citation_data and 'scholar' in current_citation_data and 'total_citations' in current_citation_data['scholar']:
                         item_data['cites'] = current_citation_data['scholar']['total_citations']
+
                     else:
                         item_data['cites'] = 0
 
                     if current_citation_data and 'scholar' in current_citation_data and 'citation_list_url' in current_citation_data['scholar']:
                         item_data['citation_url'] = current_citation_data['scholar']['citation_list_url']
+
                     else:
                         item_data['citation_url'] = None
 
@@ -1445,29 +1470,28 @@ def btex(content):
             ))
 
         for btex_div in btex_divs:
-            options = {}
-            options['css'] = btex_div['class']
-
-            options['data_source'] = get_attribute(btex_div.attrs, 'source', None)
-            options['citations'] = get_attribute(btex_div.attrs, 'citations', 'btex_citation_cache.yaml')
-
-            citation_data = load_citation_data(filename=options['citations'])
-            options['template'] = get_attribute(btex_div.attrs, 'template', 'publications')
-
-            options['years'] = get_attribute(btex_div.attrs, 'years', None)
-            options['item_count'] = get_attribute(btex_div.attrs, 'item-count', None)
-
-            options['scholar-cite-counts'] = boolean(get_attribute(btex_div.attrs, 'scholar-cite-counts', 'no'))
-            options['scholar-link'] = get_attribute(btex_div.attrs, 'scholar-link', None)
-
-            options['stats'] = boolean(get_attribute(btex_div.attrs, 'stats', 'no'))
-
-            options['target_page'] = get_attribute(btex_div.attrs, 'target-page', None)
+            options = {
+                'css': btex_div['class'],
+                'data_source': get_attribute(btex_div.attrs, 'source', None),
+                'citations': get_attribute(btex_div.attrs, 'citations', 'btex_citation_cache.yaml'),
+                'template': get_attribute(btex_div.attrs, 'template', 'publications'),
+                'years': get_attribute(btex_div.attrs, 'years', None),
+                'item_count': get_attribute(btex_div.attrs, 'item-count', None),
+                'scholar-cite-counts': boolean(get_attribute(btex_div.attrs, 'scholar-cite-counts', 'no')),
+                'scholar-link': get_attribute(btex_div.attrs, 'scholar-link', None),
+                'stats': boolean(get_attribute(btex_div.attrs, 'stats', 'no')),
+                'target_page': get_attribute(btex_div.attrs, 'target-page', None),
+            }
 
             if options['years']:
                 options['first_visible_year'] = int(datetime.now().strftime('%Y')) - int(options['years'])
+
             else:
                 options['first_visible_year'] = ''
+
+            citation_data = load_citation_data(
+                filename=options['citations']
+            )
 
             publications = parse_bibtex_file(options['data_source'])
 
@@ -1478,11 +1502,13 @@ def btex(content):
                 if google_access_valid:
                     try:
                         import scholar.scholar as sc
+
                     except ImportError:
-                        logger.warning('`pelican_btex` failed to import `scholar`')
+                        logger.warning('[btex] Failed to import `scholar`')
 
                     citation_update_needed = False
                     citation_update_count = 0
+
                     for pub in publications:
                         current_citation_data = get_citation_data(citation_data, pub['title'], pub['year'])
                         if current_citation_data:
@@ -1490,26 +1516,35 @@ def btex(content):
                             if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
                                 citation_update_needed = True
                                 citation_update_count += 1
+
                         else:
                             citation_update_needed = True
                             citation_update_count += 1
 
                     # Update citations before injecting them to the publication list
                     if citation_update_needed:
-                        logger.warning(" Citation update needed for articles: " + str(citation_update_count))
+                        logger.warning('[btex] Citation update needed for articles: {citation_update_count}'.format(citation_update_count=str(citation_update_count)))
+
                         # Go publications through paper by paper
                         for pub in publications:
                             if google_access_valid and google_queries < btex_settings['google_scholar']['max_updated_entries_per_batch']:
                                 # Check can we query google, as we
                                 # only update specified amount of entries (to avoid filling google access quota) with
                                 # specified time intervals
-                                current_citation_data = get_citation_data(citation_data=citation_data, title=pub['title'], year=pub['year'])
+                                current_citation_data = get_citation_data(
+                                    citation_data=citation_data,
+                                    title=pub['title'],
+                                    year=pub['year']
+                                )
+
                                 citation_update_needed = False
+
                                 if current_citation_data:
                                     last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'],'%Y-%m-%d %H:%M:%S').timetuple())
 
                                     if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
                                         citation_update_needed = True
+
                                 else:
                                     # We have a new article
                                     citation_update_needed = True
@@ -1520,19 +1555,23 @@ def btex(content):
                                     # Form author list
                                     authors = []
                                     for author in pub['authors']:
-                                        authors.append(" ".join(author.first()) + " " + " ".join(author.last()))
-                                    authors = ", ".join(authors)
+                                        authors.append(' '.join(author.first()) + ' ' + ' '.join(author.last()))
 
-                                    logger.warning("  Query publication [" + authors.split(',')[0] + ': '+ pub['title'] + "]")
+                                    authors = ', '.join(authors)
+
+                                    logger.warning('[btex]  Query publication [{authors}: {title}]'.format(
+                                        authors=authors.split(',')[0],
+                                        title=pub['title'])
+                                    )
 
                                     querier = sc.ScholarQuerier()
                                     settings = sc.ScholarSettings()
                                     querier.apply_settings(settings)
 
                                     query = sc.SearchScholarQuery()
-                                    query.set_author(authors.split(',')[0])  # Authors
-                                    query.set_phrase(pub['title'])  # Title
-                                    query.set_scope(True)  # Title only
+                                    query.set_author(authors.split(',')[0])     # Authors
+                                    query.set_phrase(pub['title'])              # Title
+                                    query.set_scope(True)                       # Title only
                                     query.set_num_page_results(1)
 
                                     querier.send_query(query)
@@ -1546,7 +1585,9 @@ def btex(content):
                                             year=pub['year'],
                                             insert_new=True
                                         )
-                                        logger.warning("    Cites: "+str(querier.articles[0].attrs['num_citations'][0]))
+                                        logger.warning('[btex]    Cites: {num_citations}'.format(
+                                            num_citations=str(querier.articles[0].attrs['num_citations'][0]))
+                                        )
 
                                     else:
                                         update_citation_data_empty(
@@ -1554,27 +1595,38 @@ def btex(content):
                                             title=pub['title'],
                                             year=pub['year']
                                         )
-                                        logger.warning("    Nothing returned, article might not be indexed by Google or your access quota is exceeded! ")
 
-                                    save_citation_data(filename=options['citations'], citation_data=citation_data)
+                                        logger.warning('[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
+
+                                    save_citation_data(
+                                        filename=options['citations'],
+                                        citation_data=citation_data
+                                    )
+
                                     # Wait after each query random time in order to avoid flooding Google.
                                     wait_time = randint(btex_settings['google_scholar']['fetch_item_timeout'][0],
                                                         btex_settings['google_scholar']['fetch_item_timeout'][1])
-                                    print "  Sleeping [" + str(wait_time) + " sec]"
+
+                                    logger.warning('[btex]  Sleeping [{wait_time} sec]'.format(wait_time=str(wait_time)))
                                     sleep(wait_time)
 
                 # Inject citation information to the publication list
                 for pub in publications:
-                    current_citation_data = get_citation_data(citation_data=citation_data,
-                                                              title=pub['title'],
-                                                              year=pub['year'])
+                    current_citation_data = get_citation_data(
+                        citation_data=citation_data,
+                        title=pub['title'],
+                        year=pub['year']
+                    )
+
                     if current_citation_data and 'scholar' in current_citation_data and 'total_citations' in current_citation_data['scholar']:
                         pub['cites'] = current_citation_data['scholar']['total_citations']
+
                     else:
                         pub['cites'] = 0
 
                     if current_citation_data and 'scholar' in current_citation_data and 'citation_list_url' in current_citation_data['scholar']:
                         pub['citation_url'] = current_citation_data['scholar']['citation_list_url']
+
                     else:
                         pub['citation_url'] = None
 
@@ -1589,6 +1641,7 @@ def btex(content):
                     for pub in publications:
                         if 'cites' in pub:
                             meta['cites'] += pub['cites']
+
                 author_list = []
                 type_stats = {}
                 for pub in publications:
@@ -1596,9 +1649,12 @@ def btex(content):
                         author_name = " ".join(author.first()) + " " + " ".join(author.last())
                         if author_name not in author_list:
                             author_list.append(author_name)
+
                     if pub['type_label'] not in type_stats:
                         type_stats[pub['type_label']] = 0
+
                     type_stats[pub['type_label']] += 1
+
                 meta['unique_authors'] = len(author_list)
                 meta['types'] = type_stats
 
@@ -1607,13 +1663,16 @@ def btex(content):
                     group_data = btex_publication_grouping[group_id]
                     if group_data['label'] in type_stats:
                         group_stat.append('<em>'+group_data['name'] + '</em> : ' + str(type_stats[group_data['label']]))
+
                 meta['types_html_list'] = ", ".join(group_stat)
 
-                if 'cite_update' in meta:
+                if 'cite_update' in meta and meta['cite_update']:
                     meta['cite_update_string'] = format(datetime.fromtimestamp(float(meta['cite_update'])), '%d.%m.%Y')
+
             div_text = btex_div.text
             div_text = div_text.rstrip('\r\n').replace(" ", "")
             has_template = False
+
             if len(div_text):
                 has_template = True
 
@@ -1624,16 +1683,22 @@ def btex(content):
 
             if not options['item_count']:
                 options['item_count'] = len(publications)
+
             else:
                 options['item_count'] = int(options['item_count'])
 
-            div_html = BeautifulSoup(template.render(publications=publications,
-                                                     meta=meta,
-                                                     publication_grouping=btex_publication_grouping,
-                                                     first_visible_year=options['first_visible_year'],
-                                                     item_count=options['item_count'],
-                                                     target_page=options['target_page']
-                                                     ), "html.parser")
+            div_html = BeautifulSoup(
+                template.render(
+                    publications=publications,
+                    meta=meta,
+                    publication_grouping=btex_publication_grouping,
+                    first_visible_year=options['first_visible_year'],
+                    item_count=options['item_count'],
+                    target_page=options['target_page']
+                ),
+                "html.parser"
+            )
+
             btex_div.replaceWith(div_html)
 
         if btex_settings['minified']:
@@ -1645,6 +1710,7 @@ def btex(content):
                     '<link rel="stylesheet" href="' + btex_settings['site-url'] + '/theme/css/btex.min.css">'
                 ]
             }
+
         else:
             html_elements = {
                 'js_include': [
@@ -1662,12 +1728,14 @@ def btex(content):
 
         if u'scripts' not in content.metadata:
             content.metadata[u'scripts'] = []
+
         for element in html_elements['js_include']:
             if element not in content.metadata[u'scripts']:
                 content.metadata[u'scripts'].append(element)
 
         if u'styles' not in content.metadata:
             content.metadata[u'styles'] = []
+
         for element in html_elements['css_include']:
             if element not in content.metadata[u'styles']:
                 content.metadata[u'styles'].append(element)
@@ -1680,6 +1748,7 @@ def get_citation_data(citation_data, title, year):
         for cite in citation_data:
             if 'title' in cite and 'year' in cite and str(title).lower() == cite['title'].lower() and int(year) == int(cite['year']):
                 return cite
+
     return None
 
 
@@ -1688,11 +1757,13 @@ def update_citation_data(citation_data, new_data, title=None, year=None, insert_
     found = False
     if not title:
         title = str(new_data['title'][0]).lower()
+
     else:
         title = str(title.lower())
 
     if not year:
         year = int(new_data['year'][0])
+
     else:
         year = int(year)
 
@@ -1700,14 +1771,19 @@ def update_citation_data(citation_data, new_data, title=None, year=None, insert_
         if title == cite['title'].lower() and year == int(cite['year']):
             found = True
             cite['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+
             if new_data['cluster_id'][0]:
                 cite['scholar']['cluster_id'] = str(new_data['cluster_id'][0])
+
             if new_data['num_citations'][0]:
                 cite['scholar']['total_citations'] = int(new_data['num_citations'][0])
+
             if new_data['url_pdf'][0]:
                 cite['scholar']['pdf_url'] = str(new_data['url_pdf'][0])
+
             if new_data['url_citations'][0]:
                 cite['scholar']['citation_list_url'] = str(new_data['url_citations'][0])
+
             break
 
     if not found and insert_new:
@@ -1721,10 +1797,13 @@ def update_citation_data(citation_data, new_data, title=None, year=None, insert_
 
         if new_data['cluster_id'][0]:
             current_cite['scholar']['cluster_id'] = str(new_data['cluster_id'][0])
+
         if new_data['num_citations'][0]:
             current_cite['scholar']['total_citations'] = int(new_data['num_citations'][0])
+
         if new_data['url_pdf'][0]:
             current_cite['scholar']['pdf_url'] = str(new_data['url_pdf'][0])
+
         if new_data['url_citations'][0]:
             current_cite['scholar']['citation_list_url'] = str(new_data['url_citations'][0])
 
@@ -1761,10 +1840,11 @@ def load_citation_data(filename):
             return citation_data
 
         except ValueError:
-            logger.warn('`pelican-btex` failed to load file [' + str(filename) + ']')
+            logger.warn('[btex] Failed to load file [' + str(filename) + ']')
             return None
 
     else:
+        logger.warning('[btex] No citation data file found [' + str(filename) + ']')
         return []
 
 
@@ -1776,11 +1856,15 @@ def save_citation_data(filename, citation_data):
 def oldest_citation_update(citation_data, publications):
     cite_update = None
     for pub in publications:
-        current_citation_data = get_citation_data(citation_data=citation_data,
-                                                  title=pub['title'],
-                                                  year=pub['year'])
+        current_citation_data = get_citation_data(
+            citation_data=citation_data,
+            title=pub['title'],
+            year=pub['year']
+        )
+
         if current_citation_data and 'last_update' in current_citation_data:
             last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+
             if not cite_update:
                 cite_update = last_fetch
 
@@ -1793,11 +1877,15 @@ def oldest_citation_update(citation_data, publications):
 def newest_citation_update(citation_data, publications):
     cite_update = None
     for pub in publications:
-        current_citation_data = get_citation_data(citation_data=citation_data,
-                                                  title=pub['title'],
-                                                  year=pub['year'])
+        current_citation_data = get_citation_data(
+            citation_data=citation_data,
+            title=pub['title'],
+            year=pub['year']
+        )
+
         if current_citation_data and 'last_update' in current_citation_data:
             last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'], '%Y-%m-%d %H:%M:%S').timetuple())
+
             if not cite_update:
                 cite_update = last_fetch
 
@@ -1813,7 +1901,9 @@ def get_publications_per_year(publications):
         if 'year' in pub:
             if pub['year'] not in stats:
                 stats[pub['year']] = 0
+
             stats[pub['year']] += 1
+
     stats = collections.OrderedDict(sorted(stats.items()))
     return stats
 
@@ -1824,8 +1914,10 @@ def get_cites_per_year(publications):
         if 'year' in pub:
             if pub['year'] not in stats:
                 stats[pub['year']] = 0
+
             if 'cites' in pub:
                 stats[pub['year']] += pub['cites']
+
     stats = collections.OrderedDict(sorted(stats.items()))
     return stats
 
