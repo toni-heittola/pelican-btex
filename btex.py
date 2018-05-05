@@ -41,7 +41,8 @@ btex_settings = {
     'minified': True,
     'generate_minified': True,
     'use_fontawesome_cdn': True,
-    'site-url': ''
+    'site-url': '',
+    'debug_processing': False
 }
 
 btex_publication_grouping = {
@@ -1296,11 +1297,19 @@ def search(key, publications):
 def btex(content):
     if isinstance(content, contents.Static):
         return
+
     google_queries = 0
     soup = BeautifulSoup(content._content, 'html.parser')
     btex_divs = soup.find_all('div', class_='btex')
     btex_item_divs = soup.find_all('div', class_='btex-item')
     if btex_item_divs:
+        if btex_settings['debug_processing']:
+            logger.debug(msg='[{plugin_name}] title:[{title}] divs:[{div_count}]'.format(
+                plugin_name='btex-item',
+                title=content.title,
+                div_count=len(btex_item_divs)
+            ))
+
         for btex_item_div in btex_item_divs:
             options = {}
             options['uuid'] = uuid.uuid4().hex
@@ -1428,6 +1437,13 @@ def btex(content):
                 btex_item_div.replaceWith(div_html)
 
     if btex_divs:
+        if btex_settings['debug_processing']:
+            logger.debug(msg='[{plugin_name}] title:[{title}] divs:[{div_count}]'.format(
+                plugin_name='btex',
+                title=content.title,
+                div_count=len(btex_divs)
+            ))
+
         for btex_div in btex_divs:
             options = {}
             options['css'] = btex_div['class']
@@ -1950,6 +1966,9 @@ def init_default_config(pelican):
 
     if 'BTEX_USE_FONTAWESOME_CDN' in pelican.settings:
         btex_settings['use_fontawesome_cdn'] = pelican.settings['BTEX_USE_FONTAWESOME_CDN']
+
+    if 'BTEX_DEBUG_PROCESSING' in pelican.settings:
+        btex_settings['debug_processing'] = pelican.settings['BTEX_DEBUG_PROCESSING']
 
 
 def register():
