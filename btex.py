@@ -1468,7 +1468,6 @@ def btex(content):
                 title=content.title,
                 div_count=len(btex_divs)
             ))
-
         for btex_div in btex_divs:
             options = {
                 'css': btex_div['class'],
@@ -1683,7 +1682,6 @@ def btex(content):
 
             if not options['item_count']:
                 options['item_count'] = len(publications)
-
             else:
                 options['item_count'] = int(options['item_count'])
 
@@ -1698,7 +1696,6 @@ def btex(content):
                 ),
                 "html.parser"
             )
-
             btex_div.replaceWith(div_html)
 
         if btex_settings['minified']:
