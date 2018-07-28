@@ -8,14 +8,15 @@ Pelican plugin to produce publication lists automatically from BibTeX-file.
 
 """
 
+from __future__ import print_function
 from pelican import signals, contents
 from bs4 import BeautifulSoup
 from jinja2 import Template
 import copy
-from datetime import datetime
 from docutils.parsers.rst import directives
-import cPickle as pickle
+import pickle
 import os
+import sys
 import hashlib
 import time
 import logging
@@ -141,11 +142,14 @@ def parse_bibtex_file(src_filename):
         from pybtex.database import BibliographyData, PybtexError, Entry
         from pybtex.backends import html
         import pybtex.plugin
-        import btex_style
 
     except ImportError:
         logger.warning('`pelican_btex` failed to import `pybtex`')
         return
+
+    sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+    import btex_style
+
     try:
         bibdata_all = Parser().parse_file(src_filename)
     except PybtexError as e:
@@ -275,8 +279,7 @@ def parse_bibtex_file(src_filename):
         bib_buf = StringIO()
         entry_dict = copy.deepcopy(entry.fields._dict)
 
-        entry_keys = entry_dict.keys()
-        for entry_key in entry_keys:
+        for entry_key in list(entry_dict.keys()):
             if entry_key.startswith('_'):
                 del entry_dict[entry_key]
 
@@ -1389,7 +1392,7 @@ def btex(content):
                                 # Wait after each query random time in order to avoid flooding Google.
                                 wait_time = randint(btex_settings['google_scholar']['fetch_item_timeout'][0],
                                                     btex_settings['google_scholar']['fetch_item_timeout'][1])
-                                print "  Sleeping [" + str(wait_time) + " sec]"
+                                print("  Sleeping [" + str(wait_time) + " sec]")
                                 sleep(wait_time)
                     # Inject citation information to the publication list
                     current_citation_data = get_citation_data(citation_data=citation_data,
@@ -1544,7 +1547,7 @@ def btex(content):
                                     # Wait after each query random time in order to avoid flooding Google.
                                     wait_time = randint(btex_settings['google_scholar']['fetch_item_timeout'][0],
                                                         btex_settings['google_scholar']['fetch_item_timeout'][1])
-                                    print "  Sleeping [" + str(wait_time) + " sec]"
+                                    print("  Sleeping [" + str(wait_time) + " sec]")
                                     sleep(wait_time)
 
                 # Inject citation information to the publication list
