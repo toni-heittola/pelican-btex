@@ -3,3 +3,4 @@ pybtex >= 0.20.1
 pyyaml >= 3.11
 rcssmin >= 1.0.6
 jsmin >= 2.2.1
+pylatexenc >= 0.9

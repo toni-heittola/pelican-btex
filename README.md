@@ -127,6 +127,7 @@ In addition to basic fields, there are some extra ones to associate information 
 - `_poster`, link to Poster associated to the publication
 - `_webpublication`, link to web publication associated to the publication
 - `_demo`, link to Demo associated to the publication
+- `_demo_external`, link to external Demo associated to the publication
 - `_toolbox`, link to Toolbox associated to the publication
 - `_data1` and `_data2`, link to data packages associated to the publication
 - `_code1` and `_code2`, link to code packages associated to the publication
@@ -213,6 +214,7 @@ Parameters for the plugin can be set in  `pelicanconf.py' with following paramet
 | BTEX_MINIFIED             | Boolean   | True          | Do we use minified CSS and JS files. Disable in case of debugging.  |
 | BTEX_GENERATE_MINIFIED    | Boolean   | False         | CSS and JS files are minified each time, Enable in case of development.   |
 | BTEX_USE_FONTAWESOME_CDN  | Boolean   | True          | Include CDN version of Fontawesome, disable if site template already includes this | 
+| BTEX_DEBUG_PROCESSING     | Boolean   | False         | Show extra information in when run with `DEBUG=1` |
 
 ## Getting citation counts 
 
