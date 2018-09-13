@@ -253,23 +253,10 @@ def parse_bibtex_file(src_filename):
         item['git4'] = process_link(entry.fields.get('_git4', None))
         item['git5'] = process_link(entry.fields.get('_git5', None))
 
-        item['_authors'] = entry.fields.get('_authors', None)
-        item['_affiliations'] = entry.fields.get('_affiliations', None)
-        item['_affiliations_long'] = entry.fields.get('_affiliations_long', None)
-
-        # extra
-        item['_extra_info'] = entry.fields.get('_extra_info', None)
-        item['_footnote'] = entry.fields.get('_footnote', None)
-        item['_bio'] = entry.fields.get('_bio', None)
-        item['_profile_photo'] = entry.fields.get('_profile_photo', None)
-
-        # System characteristics
-        item['_system_input'] = entry.fields.get('_system_input', None)
-        item['_system_sampling_rate'] = entry.fields.get('_system_sampling_rate', None)
-        item['_system_data_augmentation'] = entry.fields.get('_system_data_augmentation', None)
-        item['_system_features'] = entry.fields.get('_system_features', None)
-        item['_system_classifier'] = entry.fields.get('_system_classifier', None)
-        item['_system_decision_making'] = entry.fields.get('_system_decision_making', None)
+        # Add custom fields
+        for field in entry.fields.keys():
+            if field.startswith('_'):
+                item[field] = entry.fields.get(field, None)
 
         # render the bibtex string for the entry
         bib_buf = StringIO()
