@@ -1644,8 +1644,12 @@ def btex(content):
                                             title=pub['title'])
                                         )
 
+                                        query = '"' + pub['title'] + '" ' + authors
+                                        query = query.replace(u'ä', 'a').replace(u'ö', 'o')
+
                                         search_query = list(
-                                            scholarly.search_pubs_query('"' + pub['title'] + '" ' + authors))
+                                            scholarly.search_pubs_query(query)
+                                        )
                                         target_title = pub['title'].split(',')[0].strip().lower().replace('.',
                                                                                                           '').replace(
                                             '-', ' ')
