@@ -4,4 +4,6 @@ pyyaml >= 3.11
 rcssmin >= 1.0.6
 jsmin >= 2.2.1
 pylatexenc >= 0.9
-scholarly >= 0.2.3
+arrow>=0.12.1
+bibtexparser>=1.0.1
+requests>=2.19.1

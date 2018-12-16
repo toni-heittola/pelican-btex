@@ -1340,7 +1340,7 @@ def btex(content):
                     if google_access_valid:
                         use_scholarly = False
                         try:
-                            import scholarly
+                            import scholary.scholarly as scholarly
                             use_scholarly = True
 
                         except ImportError:
@@ -1567,7 +1567,7 @@ def btex(content):
                 if google_access_valid:
                     use_scholarly = False
                     try:
-                        import scholarly
+                        import scholary.scholarly as scholarly
                         use_scholarly = True
 
                     except ImportError:
