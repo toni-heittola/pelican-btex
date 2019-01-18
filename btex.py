@@ -160,6 +160,7 @@ def parse_bibtex_file(src_filename):
         return
 
     publications = []
+
     # format entries
     style = btex_style.Style()
 
@@ -198,6 +199,7 @@ def parse_bibtex_file(src_filename):
             item['authors_text'] = ", ".join(authors[:-1]) + " and " + authors[-1]
         else:
             item['authors_text'] = authors[0]
+
         if '\\' in item['authors_text']:
             from pylatexenc.latexwalker import LatexWalker
             from pylatexenc.latex2text import LatexNodes2Text
@@ -243,9 +245,13 @@ def parse_bibtex_file(src_filename):
         item['link2'] = process_link(entry.fields.get('_link2', None))
         item['link3'] = process_link(entry.fields.get('_link3', None))
         item['link4'] = process_link(entry.fields.get('_link4', None))
+        item['link5'] = process_link(entry.fields.get('_link5', None))
 
         item['data1'] = process_link(entry.fields.get('_data1', None))
         item['data2'] = process_link(entry.fields.get('_data2', None))
+        item['data3'] = process_link(entry.fields.get('_data3', None))
+        item['data4'] = process_link(entry.fields.get('_data4', None))
+        item['data5'] = process_link(entry.fields.get('_data5', None))
 
         item['code1'] = process_link(entry.fields.get('_code1', None))
         item['code2'] = process_link(entry.fields.get('_code2', None))
@@ -1334,7 +1340,7 @@ def btex(content):
                     if google_access_valid:
                         use_scholarly = False
                         try:
-                            import scholarly
+                            import scholary.scholarly as scholarly
                             use_scholarly = True
 
                         except ImportError:
@@ -1561,7 +1567,7 @@ def btex(content):
                 if google_access_valid:
                     use_scholarly = False
                     try:
-                        import scholarly
+                        import scholary.scholarly as scholarly
                         use_scholarly = True
 
                     except ImportError:
