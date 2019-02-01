@@ -1646,12 +1646,12 @@ def btex(content):
                                         authors = ', '.join(authors)
 
                                         logger.warning('[btex]  Query publication [{authors}: {title}]'.format(
-                                            authors=authors.split(',')[0],
+                                            authors=authors.split(',')[0].replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ß', 's'),
                                             title=pub['title'])
                                         )
 
                                         query = '"' + pub['title'] + '" ' + authors
-                                        query = query.replace(u'ä', 'a').replace(u'ö', 'o')
+                                        query = query.replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ß', 's')
 
                                         search_query = list(
                                             scholarly.search_pubs_query(query)
