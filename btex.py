@@ -1998,8 +1998,13 @@ def update_citation_data_empty(citation_data, title, year):
 def load_citation_data(filename):
     if os.path.isfile(filename):
         try:
-            with open(filename, 'r') as field:
-                citation_data = yaml.load(field)
+            from distutils.version import LooseVersion
+            if LooseVersion(str(yaml.__version__)) >= "5.1":
+                with open(filename, 'r') as field:
+                    citation_data = yaml.load(field, Loader=yaml.FullLoader)
+            else:
+                with open(filename, 'r') as field:
+                    citation_data = yaml.load(field)
 
             if 'data' in citation_data:
                 citation_data = citation_data['data']
