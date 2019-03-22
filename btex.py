@@ -1288,7 +1288,19 @@ def get_default_item_template(options):
 
 
 def search(key, publications):
-    return [element for element in publications if element['key'] == key]
+    matches = []
+    if publications:
+        for element in publications:
+            if element['key'] == key:
+                matches.append(element)
+
+    if len(matches) == 0:
+        logger.warn(
+            '`pelican-btex` bibtex key [{key}] was not found'.format(
+                key=key
+            ))
+
+    return matches
 
 
 def btex(content):
