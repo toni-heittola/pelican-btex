@@ -1604,7 +1604,7 @@ def btex(content):
 
                         import random
                         pub_ids = list(range(len(publications)))
-                        # random.shuffle(pub_ids)
+                        random.shuffle(pub_ids)
                         for pub_id in pub_ids:
                             scholar_citations_found = False
                             pub = publications[pub_id]
