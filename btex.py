@@ -52,7 +52,7 @@ btex_publication_grouping = {
         'name': 'Books',
         'label': 'Book',
         'label_short': 'Book',
-        'entry_types': ['book', 'phdthesis'],
+        'entry_types': ['book'],
         'css': 'label label-primary',
     },
     1: {
