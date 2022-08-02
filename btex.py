@@ -1414,6 +1414,9 @@ def btex(content):
                                         authors=authors.split(',')[0],
                                         title=item_data['title'])
                                     )
+
+                                    search_query = None
+
                                     if use_scholarly0:
                                         search_query = list(
                                             scholarly.search_pubs_query('"' + item_data['title'] + '" ' + authors)
@@ -1443,10 +1446,8 @@ def btex(content):
                                                 else:
                                                     break
 
+                                    target_title = item_data['title'].split(',')[0].strip().lower().replace('.', '').replace('-', ' ')
 
-                                    target_title = item_data['title'].split(',')[0].strip().lower().replace('.',
-                                                                                                            '').replace(
-                                        '-', ' ')
                                     if search_query:
                                         total_citations = None
                                         for result in search_query:
@@ -1723,6 +1724,8 @@ def btex(content):
 
                                         query = '"' + pub['title'] + '" ' + authors
                                         query = query.replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ß', 's').replace(u'é', 'e')
+
+                                        search_query = None
 
                                         if use_scholarly0:
                                             search_query = list(
