@@ -1430,7 +1430,7 @@ def btex(content):
                                                 break
 
                                             except MaxTriesExceededException:
-                                                logger.warning('[btex]  Google Scholar [MaxTriesExceededException] try [{try_id}]'.format(try_id=try_id))
+                                                logger.warning('[btex]    Google Scholar [MaxTriesExceededException] try [{try_id}]'.format(try_id=try_id))
                                                 fetch_complete = False
                                                 if btex_settings['google_scholar']['proxy']:
                                                     pg = ProxyGenerator()
