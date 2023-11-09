@@ -1524,11 +1524,11 @@ def btex(content):
                                     logger.warning('[btex]    Cites [{num_citations}]'.format(str(total_citations)))
 
                                 else:
-                                    update_citation_data_empty(
-                                        citation_data=citation_data,
-                                        title=item_data['title'],
-                                        year=item_data['year']
-                                    )
+                                    #update_citation_data_empty(
+                                    #    citation_data=citation_data,
+                                    #    title=item_data['title'],
+                                    #    year=item_data['year']
+                                    #)
 
                                     logger.warning(
                                         '[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
@@ -1839,11 +1839,11 @@ def btex(content):
                                         )
 
                                     else:
-                                        update_citation_data_empty(
-                                            citation_data=citation_data,
-                                            title=pub['title'],
-                                            year=pub['year']
-                                        )
+                                        #update_citation_data_empty(
+                                        #    citation_data=citation_data,
+                                        #    title=pub['title'],
+                                        #    year=pub['year']
+                                        #)
 
                                         logger.warning(
                                             '[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
