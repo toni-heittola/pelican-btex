@@ -1361,7 +1361,7 @@ def btex(content):
 
                             if btex_settings['google_scholar']['proxy']:
                                 pg = ProxyGenerator()
-                                pg.FreeProxies()
+                                pg.FreeProxies(timeout=0.5, wait_time=60, google=True)
                                 scholarly.use_proxy(pg)
 
                             use_scholarly1 = True
@@ -1440,7 +1440,7 @@ def btex(content):
                                                 fetch_complete = False
                                                 if btex_settings['google_scholar']['proxy']:
                                                     pg = ProxyGenerator()
-                                                    pg.FreeProxies(timeout=1, wait_time=120)
+                                                    pg.FreeProxies(timeout=0.5, wait_time=60, google=True)
                                                     scholarly.use_proxy(pg)
 
                                                 else:
@@ -1634,7 +1634,7 @@ def btex(content):
 
                         if btex_settings['google_scholar']['proxy']:
                             pg = ProxyGenerator()
-                            pg.FreeProxies()
+                            pg.FreeProxies(timeout=0.5, wait_time=60, google=True)
                             scholarly.use_proxy(pg)
 
                         use_scholarly1 = True
@@ -1747,7 +1747,7 @@ def btex(content):
                                                     fetch_complete = False
                                                     if btex_settings['google_scholar']['proxy']:
                                                         pg = ProxyGenerator()
-                                                        pg.FreeProxies(timeout=1, wait_time=120)
+                                                        pg.FreeProxies(timeout=0.5, wait_time=60, google=True)
                                                         scholarly.use_proxy(pg)
 
                                                     else:
