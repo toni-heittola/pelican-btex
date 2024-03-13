@@ -2404,7 +2404,7 @@ def update_based_on_author(author_name, bibtex_filename, cache_filename):
                     cluster_id=None,
                     total_citations=pub_info['num_citations'],
                     pdf_url=None,
-                    citation_list_url=pub_info['citedby_url']
+                    citation_list_url=pub_info['citedby_url'] if 'citedby_url' in pub_info else None
                 )
 
         if pub_found:
