@@ -2360,3 +2360,101 @@ def register():
 
     signals.article_generator_finalized.connect(move_resources)
     signals.content_object_init.connect(btex)
+
+def update_based_on_author(author_name, bibtex_filename, cache_filename):
+    bib = parse_bibtex_file(bibtex_filename)
+
+    citation_data = load_citation_data(filename=cache_filename)
+
+    from scholarly import scholarly
+    search_query = scholarly.search_author(author_name)
+    author_info = scholarly.fill(next(search_query))
+
+    for pub in bib:
+        current_publication_title = pub['title']
+
+        pub_found = False
+        pub_info = None
+        for author_pub in author_info['publications']:
+            if author_pub['bib']['title'].lower() == current_publication_title.lower():
+                pub_found = True
+                pub_info = author_pub
+                break
+
+        if pub_found:
+            citation_found = False
+            citation_info = None
+            for citation_pub in citation_data:
+                if citation_pub['title'].lower() == current_publication_title.lower():
+                    citation_found = True
+                    citation_info = citation_pub
+                    break
+
+            if citation_found:
+                citation_pub['scholar']['total_citations'] = pub_info['num_citations']
+                current_timestamp = time.time()
+                citation_pub['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+
+            else:
+                update_citation_data(
+                    citation_data=citation_data,
+                    title=pub['title'],
+                    year=pub['year'],
+                    insert_new=True,
+                    cluster_id=None,
+                    total_citations=pub_info['num_citations'],
+                    pdf_url=None,
+                    citation_list_url=pub_info['citedby_url']
+                )
+
+        if pub_found:
+            print('updated', '[' + current_publication_title + ']', pub_info['num_citations'])
+        else:
+            print('skipped', '[' + current_publication_title + ']')
+
+    save_citation_data(filename=args.cache_filename, citation_data=citation_data)
+
+if __name__ == '__main__':
+    import argparse
+    from argparse import RawTextHelpFormatter
+    import textwrap
+
+    parser = argparse.ArgumentParser(
+        prefix_chars='-+',
+        description=textwrap.dedent(
+            '''\
+            pelican-btex
+            ===========================================                        
+            '''
+        ),
+        formatter_class=RawTextHelpFormatter
+
+    )
+    parser.add_argument(
+        '--author',
+        help='Author name',
+        dest='author_name',
+        required=False,
+        type=str
+    )
+    parser.add_argument(
+        '--bib',
+        help='bibtex filename',
+        dest='bibtex_filename',
+        required=False,
+        type=str
+    )
+    parser.add_argument(
+        '--cache',
+        help='cache filename to store citations',
+        dest='cache_filename',
+        required=False,
+        type=str
+    )
+    args = parser.parse_args()
+    if args.bibtex_filename and args.cache_filename and args.author_name:
+        update_based_on_author(
+            author_name=args.author_name,
+            bibtex_filename=args.bibtex_filename,
+            cache_filename=args.cache_filename
+        )
