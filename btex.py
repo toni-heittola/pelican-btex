@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Publication list plugin for Pelican
@@ -1356,8 +1357,8 @@ def btex(content):
                         use_scholarly1 = False
 
                         try:
-                            from scholarly import scholarly
-                            from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+                            from scholary import scholarly
+                            from scholary import ProxyGenerator, DOSException, MaxTriesExceededException
 
                             if btex_settings['google_scholar']['proxy']:
                                 pg = ProxyGenerator()
@@ -1629,8 +1630,8 @@ def btex(content):
                     use_scholarly0 = False
                     use_scholarly1 = False
                     try:
-                        from scholarly import scholarly
-                        from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+                        from scholary import scholarly
+                        from scholary import ProxyGenerator, DOSException, MaxTriesExceededException
 
                         if btex_settings['google_scholar']['proxy']:
                             pg = ProxyGenerator()
@@ -2361,12 +2362,19 @@ def register():
     signals.article_generator_finalized.connect(move_resources)
     signals.content_object_init.connect(btex)
 
-def update_based_on_author(author_name, bibtex_filename, cache_filename):
+def update_based_on_author(author_name, bibtex_filename, cache_filename, use_proxy=None):
     bib = parse_bibtex_file(bibtex_filename)
 
     citation_data = load_citation_data(filename=cache_filename)
 
     from scholarly import scholarly
+    from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+
+    if use_proxy or btex_settings['google_scholar']['proxy']:
+        pg = ProxyGenerator()
+        pg.FreeProxies(timeout=0.5, wait_time=60)
+        scholarly.use_proxy(pg)
+
     search_query = scholarly.search_author(author_name)
     author_info = scholarly.fill(next(search_query))
 
@@ -2414,6 +2422,63 @@ def update_based_on_author(author_name, bibtex_filename, cache_filename):
 
     save_citation_data(filename=args.cache_filename, citation_data=citation_data)
 
+def update_based_on_source(source_name, bibtex_filename, cache_filename, use_proxy=None):
+    #from IPython import embed
+    #embed()
+    bib = parse_bibtex_file(bibtex_filename)
+
+    citation_data = load_citation_data(filename=cache_filename)
+
+    from scholarly import scholarly
+    from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+
+    if use_proxy or btex_settings['google_scholar']['proxy']:
+        pg = ProxyGenerator()
+        pg.FreeProxies(timeout=0.5, wait_time=60)
+        scholarly.use_proxy(pg)
+
+    query_url = ('/scholar?as_q=&as_epq=&as_oq=&as_eq=&as_occt=any&as_sauthors=&'
+                 'as_publication=%22'+source_name+'%22&as_ylo=&as_yhi=&hl=en&as_sdt=0%2C5')
+
+    search_query = scholarly.search_pubs_custom_url(query_url)
+    for result in search_query:
+        current_bib = result['bib']
+
+        pub_found = False
+        for pub in bib:
+            current_publication_title = pub['title']
+
+            if current_bib['title'].lower() == current_publication_title.lower():
+                pub_found = True
+
+                for citation_pub in citation_data:
+                    if citation_pub['title'].lower() == current_publication_title.lower():
+                        citation_found = True
+                        citation_pub['scholar']['total_citations'] = result['num_citations']
+                        current_timestamp = time.time()
+                        citation_pub['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+
+                if not citation_found:
+                    update_citation_data(
+                        citation_data=citation_data,
+                        title=pub['title'],
+                        year=pub['year'],
+                        insert_new=True,
+                        cluster_id=None,
+                        total_citations=result['num_citations'],
+                        pdf_url=None,
+                        citation_list_url=result['citedby_url'] if 'citedby_url' in result else None
+                    )
+                break
+
+        if pub_found:
+            print('updated', '[' + current_bib['title'] + ']', result['num_citations'])
+        else:
+            print('skipped', '[' + current_bib['title'] + ']')
+
+    save_citation_data(filename=args.cache_filename, citation_data=citation_data)
+
+
 if __name__ == '__main__':
     import argparse
     from argparse import RawTextHelpFormatter
@@ -2430,6 +2495,7 @@ if __name__ == '__main__':
         formatter_class=RawTextHelpFormatter
 
     )
+
     parser.add_argument(
         '--author',
         help='Author name',
@@ -2437,6 +2503,22 @@ if __name__ == '__main__':
         required=False,
         type=str
     )
+
+    parser.add_argument(
+        '--source',
+        help='Source name',
+        dest='source_name',
+        required=False,
+        type=str
+    )
+
+    parser.add_argument(
+        '--use_proxy',
+        help='Use proxy',
+        dest='use_proxy',
+        action = 'store_true'
+    )
+
     parser.add_argument(
         '--bib',
         help='bibtex filename',
@@ -2444,6 +2526,7 @@ if __name__ == '__main__':
         required=False,
         type=str
     )
+
     parser.add_argument(
         '--cache',
         help='cache filename to store citations',
@@ -2451,10 +2534,21 @@ if __name__ == '__main__':
         required=False,
         type=str
     )
+
     args = parser.parse_args()
+
     if args.bibtex_filename and args.cache_filename and args.author_name:
         update_based_on_author(
             author_name=args.author_name,
             bibtex_filename=args.bibtex_filename,
-            cache_filename=args.cache_filename
+            cache_filename=args.cache_filename,
+            use_proxy=args.use_proxy
+        )
+
+    elif args.bibtex_filename and args.cache_filename and args.source_name:
+        update_based_on_source(
+            source_name=args.source_name,
+            bibtex_filename=args.bibtex_filename,
+            cache_filename=args.cache_filename,
+            use_proxy=args.use_proxy
         )
