@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Publication list plugin for Pelican
@@ -195,7 +196,7 @@ def parse_bibtex_file(src_filename):
 
         authors = []
         for author in item['authors']:
-            authors.append(author.first()[0] + ' ' + ' '.join(author.last()))
+            authors.append(author.first_names[0] + ' ' + ' '.join(author.last_names))
 
         if len(authors) > 1:
             item['authors_text'] = ", ".join(authors[:-1]) + " and " + authors[-1]
@@ -1356,12 +1357,12 @@ def btex(content):
                         use_scholarly1 = False
 
                         try:
-                            from scholarly import scholarly
-                            from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+                            from scholary import scholarly
+                            from scholary import ProxyGenerator, DOSException, MaxTriesExceededException
 
                             if btex_settings['google_scholar']['proxy']:
                                 pg = ProxyGenerator()
-                                pg.FreeProxies()
+                                pg.FreeProxies(timeout=0.5, wait_time=60)
                                 scholarly.use_proxy(pg)
 
                             use_scholarly1 = True
@@ -1440,7 +1441,7 @@ def btex(content):
                                                 fetch_complete = False
                                                 if btex_settings['google_scholar']['proxy']:
                                                     pg = ProxyGenerator()
-                                                    pg.FreeProxies(timeout=1, wait_time=120)
+                                                    pg.FreeProxies(timeout=0.5, wait_time=60)
                                                     scholarly.use_proxy(pg)
 
                                                 else:
@@ -1524,11 +1525,11 @@ def btex(content):
                                     logger.warning('[btex]    Cites [{num_citations}]'.format(str(total_citations)))
 
                                 else:
-                                    update_citation_data_empty(
-                                        citation_data=citation_data,
-                                        title=item_data['title'],
-                                        year=item_data['year']
-                                    )
+                                    #update_citation_data_empty(
+                                    #    citation_data=citation_data,
+                                    #    title=item_data['title'],
+                                    #    year=item_data['year']
+                                    #)
 
                                     logger.warning(
                                         '[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
@@ -1629,12 +1630,12 @@ def btex(content):
                     use_scholarly0 = False
                     use_scholarly1 = False
                     try:
-                        from scholarly import scholarly
-                        from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+                        from scholary import scholarly
+                        from scholary import ProxyGenerator, DOSException, MaxTriesExceededException
 
                         if btex_settings['google_scholar']['proxy']:
                             pg = ProxyGenerator()
-                            pg.FreeProxies()
+                            pg.FreeProxies(timeout=0.5, wait_time=60)
                             scholarly.use_proxy(pg)
 
                         use_scholarly1 = True
@@ -1747,7 +1748,7 @@ def btex(content):
                                                     fetch_complete = False
                                                     if btex_settings['google_scholar']['proxy']:
                                                         pg = ProxyGenerator()
-                                                        pg.FreeProxies(timeout=1, wait_time=120)
+                                                        pg.FreeProxies(timeout=0.5, wait_time=60)
                                                         scholarly.use_proxy(pg)
 
                                                     else:
@@ -1839,11 +1840,11 @@ def btex(content):
                                         )
 
                                     else:
-                                        update_citation_data_empty(
-                                            citation_data=citation_data,
-                                            title=pub['title'],
-                                            year=pub['year']
-                                        )
+                                        #update_citation_data_empty(
+                                        #    citation_data=citation_data,
+                                        #    title=pub['title'],
+                                        #    year=pub['year']
+                                        #)
 
                                         logger.warning(
                                             '[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
@@ -2360,3 +2361,213 @@ def register():
 
     signals.article_generator_finalized.connect(move_resources)
     signals.content_object_init.connect(btex)
+
+def update_based_on_author(author_name, bibtex_filename, cache_filename, use_proxy=None):
+    bib = parse_bibtex_file(bibtex_filename)
+
+    citation_data = load_citation_data(filename=cache_filename)
+
+    from scholarly import scholarly
+    from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+
+    if use_proxy or btex_settings['google_scholar']['proxy']:
+        pg = ProxyGenerator()
+        pg.FreeProxies(timeout=0.5, wait_time=60)
+        scholarly.use_proxy(pg)
+
+    search_query = scholarly.search_author(author_name)
+    author_info = scholarly.fill(next(search_query))
+
+    for pub in bib:
+        current_publication_title = pub['title']
+
+        pub_found = False
+        pub_info = None
+        for author_pub in author_info['publications']:
+            if author_pub['bib']['title'].lower() == current_publication_title.lower():
+                pub_found = True
+                pub_info = author_pub
+                break
+
+        if pub_found:
+            citation_found = False
+            citation_info = None
+            for citation_pub in citation_data:
+                if citation_pub['title'].lower() == current_publication_title.lower():
+                    citation_found = True
+                    citation_info = citation_pub
+                    break
+
+            if citation_found:
+                citation_pub['scholar']['total_citations'] = pub_info['num_citations']
+                current_timestamp = time.time()
+                citation_pub['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+
+            else:
+                update_citation_data(
+                    citation_data=citation_data,
+                    title=pub['title'],
+                    year=pub['year'],
+                    insert_new=True,
+                    cluster_id=None,
+                    total_citations=pub_info['num_citations'],
+                    pdf_url=None,
+                    citation_list_url=pub_info['citedby_url'] if 'citedby_url' in pub_info else None
+                )
+
+        if pub_found:
+            print('updated', '[' + current_publication_title + ']', pub_info['num_citations'])
+        else:
+            print('skipped', '[' + current_publication_title + ']')
+
+    save_citation_data(filename=args.cache_filename, citation_data=citation_data)
+
+def update_based_on_source(source_name, bibtex_filename, cache_filename, use_proxy=None):
+
+    if ';' in bibtex_filename:
+        bibtex_filename_parts = bibtex_filename.split(';')
+        bib = []
+        for f in bibtex_filename_parts:
+            bib += parse_bibtex_file(f)
+    else:
+        bib = parse_bibtex_file(bibtex_filename)
+    #from IPython import embed
+    #embed()
+    citation_data = load_citation_data(filename=cache_filename)
+
+    from scholarly import scholarly
+    from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+
+    if use_proxy or btex_settings['google_scholar']['proxy']:
+        pg = ProxyGenerator()
+        pg.FreeProxies(timeout=0.5, wait_time=60)
+        scholarly.use_proxy(pg)
+
+    query_url = ('/scholar?as_q=&as_epq=&as_oq=&as_eq=&as_occt=any&as_sauthors=&'
+                 'as_publication=%22'+source_name+'%22&as_ylo=&as_yhi=&hl=en&as_sdt=0%2C5')
+
+    search_query = scholarly.search_pubs_custom_url(query_url)
+    for result in search_query:
+        current_bib = result['bib']
+        current_bib_title = current_bib['title'].lower()
+
+        # Remove period from the end
+        if current_bib_title[-1] == '.':
+            current_bib_title = current_bib_title[:-1]
+
+        pub_found = False
+        for pub in bib:
+            current_publication_title = pub['title'].lower()
+            # Remove period from the end
+            if current_publication_title[-1] == '.':
+                current_publication_title = current_publication_title[:-1]
+
+            if current_bib_title == current_publication_title:
+                pub_found = True
+                citation_found = False
+                for citation_pub in citation_data:
+                    citation_pub_title = citation_pub['title'].lower()
+                    # Remove period from the end
+                    if citation_pub_title[-1] == '.':
+                        citation_pub_title = citation_pub_title[:-1]
+
+                    if citation_pub_title == current_publication_title:
+                        citation_found = True
+                        citation_pub['scholar']['total_citations'] = result['num_citations']
+                        current_timestamp = time.time()
+                        citation_pub['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+
+                if not citation_found:
+                    update_citation_data(
+                        citation_data=citation_data,
+                        title=pub['title'],
+                        year=pub['year'],
+                        insert_new=True,
+                        cluster_id=None,
+                        total_citations=result['num_citations'],
+                        pdf_url=None,
+                        citation_list_url=result['citedby_url'] if 'citedby_url' in result else None
+                    )
+                break
+
+        if pub_found:
+            print('updated', '[' + current_bib['title'] + ']', result['num_citations'])
+        #else:
+        #    print('skipped', '[' + current_bib['title'] + ']')
+
+    save_citation_data(filename=args.cache_filename, citation_data=citation_data)
+
+
+if __name__ == '__main__':
+    import argparse
+    from argparse import RawTextHelpFormatter
+    import textwrap
+
+    parser = argparse.ArgumentParser(
+        prefix_chars='-+',
+        description=textwrap.dedent(
+            '''\
+            pelican-btex
+            ===========================================                        
+            '''
+        ),
+        formatter_class=RawTextHelpFormatter
+
+    )
+
+    parser.add_argument(
+        '--author',
+        help='Author name',
+        dest='author_name',
+        required=False,
+        type=str
+    )
+
+    parser.add_argument(
+        '--source',
+        help='Source name',
+        dest='source_name',
+        required=False,
+        type=str
+    )
+
+    parser.add_argument(
+        '--use_proxy',
+        help='Use proxy',
+        dest='use_proxy',
+        action = 'store_true'
+    )
+
+    parser.add_argument(
+        '--bib',
+        help='bibtex filename(s), separate multiple with ; ',
+        dest='bibtex_filename',
+        required=False,
+        type=str
+    )
+
+    parser.add_argument(
+        '--cache',
+        help='cache filename to store citations',
+        dest='cache_filename',
+        required=False,
+        type=str
+    )
+
+    args = parser.parse_args()
+
+    if args.bibtex_filename and args.cache_filename and args.author_name:
+        update_based_on_author(
+            author_name=args.author_name,
+            bibtex_filename=args.bibtex_filename,
+            cache_filename=args.cache_filename,
+            use_proxy=args.use_proxy
+        )
+
+    elif args.bibtex_filename and args.cache_filename and args.source_name:
+        update_based_on_source(
+            source_name=args.source_name,
+            bibtex_filename=args.bibtex_filename,
+            cache_filename=args.cache_filename,
+            use_proxy=args.use_proxy
+        )
