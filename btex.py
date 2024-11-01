@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Publication list plugin for Pelican
@@ -1630,8 +1629,8 @@ def btex(content):
                     use_scholarly0 = False
                     use_scholarly1 = False
                     try:
-                        from scholary import scholarly
-                        from scholary import ProxyGenerator, DOSException, MaxTriesExceededException
+                        from scholarly import scholarly
+                        from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
 
                         if btex_settings['google_scholar']['proxy']:
                             pg = ProxyGenerator()
@@ -1840,11 +1839,11 @@ def btex(content):
                                         )
 
                                     else:
-                                        #update_citation_data_empty(
-                                        #    citation_data=citation_data,
-                                        #    title=pub['title'],
-                                        #    year=pub['year']
-                                        #)
+                                        update_citation_data_empty(
+                                            citation_data=citation_data,
+                                            title=pub['title'],
+                                            year=pub['year']
+                                        )
 
                                         logger.warning(
                                             '[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')

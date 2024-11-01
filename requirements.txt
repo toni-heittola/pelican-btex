@@ -7,3 +7,4 @@ pylatexenc >= 0.9
 arrow>=0.12.1
 bibtexparser>=1.0.1
 requests>=2.19.1
+scholarly>=1.7.11
