@@ -2431,8 +2431,7 @@ def update_based_on_source(source_name, bibtex_filename, cache_filename, use_pro
             bib += parse_bibtex_file(f)
     else:
         bib = parse_bibtex_file(bibtex_filename)
-    #from IPython import embed
-    #embed()
+
     citation_data = load_citation_data(filename=cache_filename)
 
     from scholarly import scholarly
