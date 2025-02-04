@@ -2114,7 +2114,7 @@ def load_citation_data(filename):
                 with open(filename, 'r') as field:
                     citation_data = yaml.load(field)
 
-            if 'data' in citation_data:
+            if citation_data and 'data' in citation_data:
                 citation_data = citation_data['data']
 
             return citation_data
