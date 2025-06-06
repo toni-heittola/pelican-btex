@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
 Publication list plugin for Pelican
@@ -34,6 +35,8 @@ __version__ = '0.1.0'
 btex_settings = {
     'google_scholar': {
         'active': True,
+        'proxy': False,
+        'proxy_rotations': 10,
         'fetching_timeout': 60 * 60 * 24 * 7,
         'max_updated_entries_per_batch': 10,
         'fetch_item_timeout': [10, 60],
@@ -52,7 +55,7 @@ btex_publication_grouping = {
         'name': 'Books',
         'label': 'Book',
         'label_short': 'Book',
-        'entry_types': ['book', 'phdthesis'],
+        'entry_types': ['book'],
         'css': 'label label-primary',
     },
     1: {
@@ -160,6 +163,7 @@ def parse_bibtex_file(src_filename):
         return
 
     publications = []
+
     # format entries
     style = btex_style.Style()
 
@@ -192,12 +196,13 @@ def parse_bibtex_file(src_filename):
 
         authors = []
         for author in item['authors']:
-            authors.append(author.first()[0] + ' ' + ' '.join(author.last()))
+            authors.append(author.first_names[0] + ' ' + ' '.join(author.last_names))
 
         if len(authors) > 1:
             item['authors_text'] = ", ".join(authors[:-1]) + " and " + authors[-1]
         else:
             item['authors_text'] = authors[0]
+
         if '\\' in item['authors_text']:
             from pylatexenc.latexwalker import LatexWalker
             from pylatexenc.latex2text import LatexNodes2Text
@@ -243,9 +248,13 @@ def parse_bibtex_file(src_filename):
         item['link2'] = process_link(entry.fields.get('_link2', None))
         item['link3'] = process_link(entry.fields.get('_link3', None))
         item['link4'] = process_link(entry.fields.get('_link4', None))
+        item['link5'] = process_link(entry.fields.get('_link5', None))
 
         item['data1'] = process_link(entry.fields.get('_data1', None))
         item['data2'] = process_link(entry.fields.get('_data2', None))
+        item['data3'] = process_link(entry.fields.get('_data3', None))
+        item['data4'] = process_link(entry.fields.get('_data4', None))
+        item['data5'] = process_link(entry.fields.get('_data5', None))
 
         item['code1'] = process_link(entry.fields.get('_code1', None))
         item['code2'] = process_link(entry.fields.get('_code2', None))
@@ -1282,7 +1291,19 @@ def get_default_item_template(options):
 
 
 def search(key, publications):
-    return [element for element in publications if element['key'] == key]
+    matches = []
+    if publications:
+        for element in publications:
+            if element['key'] == key:
+                matches.append(element)
+
+    if len(matches) == 0:
+        logger.warn(
+            '`pelican-btex` bibtex key [{key}] was not found'.format(
+                key=key
+            ))
+
+    return matches
 
 
 def btex(content):
@@ -1332,13 +1353,27 @@ def btex(content):
                     google_access_valid = btex_settings['google_scholar']['active']
                     current_timestamp = time.time()
                     if google_access_valid:
-                        use_scholarly = False
+                        use_scholarly0 = False
+                        use_scholarly1 = False
+
                         try:
-                            import scholarly
-                            use_scholarly = True
+                            from scholary import scholarly
+                            from scholary import ProxyGenerator, DOSException, MaxTriesExceededException
+
+                            if btex_settings['google_scholar']['proxy']:
+                                pg = ProxyGenerator()
+                                pg.FreeProxies(timeout=0.5, wait_time=60)
+                                scholarly.use_proxy(pg)
+
+                            use_scholarly1 = True
 
                         except ImportError:
-                            logger.warning('[btex] Failed to import `scholarly` module.')
+                            try:
+                                import scholary.scholarly as scholarly
+                                use_scholarly0 = True
+
+                            except ImportError:
+                                logger.warning('[btex] Failed to import `scholarly` module.')
 
                         try:
                             import scholar.scholar as sc
@@ -1369,7 +1404,7 @@ def btex(content):
                                 # Fetch article from google
                                 # print "  Query publication ["+pub['title']+"]"
 
-                                if use_scholarly:
+                                if use_scholarly0 or use_scholarly1:
                                     authors = []
                                     for author in item_data['authors']:
                                         authors.append(' '.join(author.last()))
@@ -1381,35 +1416,68 @@ def btex(content):
                                         title=item_data['title'])
                                     )
 
-                                    search_query = list(
-                                        scholarly.search_pubs_query('"' + item_data['title'] + '" ' + authors))
-                                    target_title = item_data['title'].split(',')[0].strip().lower().replace('.',
-                                                                                                            '').replace(
-                                        '-', ' ')
+                                    search_query = None
+
+                                    if use_scholarly0:
+                                        search_query = list(
+                                            scholarly.search_pubs_query('"' + item_data['title'] + '" ' + authors)
+                                        )
+
+                                    elif use_scholarly1:
+                                        fetch_complete = False
+                                        for try_id in range(0, btex_settings['google_scholar']['proxy_rotations']):
+                                            try:
+                                                search_query = list(
+                                                    scholarly.search_pubs(query)
+                                                )
+                                                fetch_complete = True
+                                                break
+
+                                            except MaxTriesExceededException:
+                                                logger.warning('[btex]      Google Scholar [MaxTriesExceededException] try [{try_id}/{max_try}]'.format(
+                                                    try_id=try_id+1,
+                                                    max_try=btex_settings['google_scholar']['proxy_rotations']-1
+                                                ))
+                                                fetch_complete = False
+                                                if btex_settings['google_scholar']['proxy']:
+                                                    pg = ProxyGenerator()
+                                                    pg.FreeProxies(timeout=0.5, wait_time=60)
+                                                    scholarly.use_proxy(pg)
+
+                                                else:
+                                                    break
+
+                                    target_title = item_data['title'].split(',')[0].strip().lower().replace('.', '').replace('-', ' ')
+
                                     if search_query:
                                         total_citations = None
                                         for result in search_query:
                                             if result:
-                                                returned_title = result.bib['title'].split(',')[
-                                                    0].strip().lower().replace('.', '').replace('-', ' ')
-                                                if target_title == returned_title:
-                                                    scholar_citations_found = True
-                                                    if hasattr(result, 'citedby'):
-                                                        if total_citations is None:
-                                                            total_citations = result.citedby
-                                                        else:
-                                                            total_citations += result.citedby
+                                                current_citedby = 0
+                                                cluster_id = None
+                                                pdf_url = None
 
+                                                if use_scholarly0:
+                                                    returned_title = result.bib['title'].split(',')[0].strip().lower().replace('.', '').replace('-', ' ')
+                                                    if hasattr(result, 'citedby'):
+                                                        current_citedby = result.citedby
                                                     if hasattr(result, 'id_scholarcitedby'):
                                                         cluster_id = result.id_scholarcitedby
-                                                    else:
-                                                        cluster_id = None
-
                                                     if hasattr(result, 'eprint'):
-                                                        pdf_url = result.bib['eprint'].replace(
-                                                            'https://scholar.google.com', '')
+                                                        pdf_url = result.bib['eprint'].replace('https://scholar.google.com', '')
+
+                                                elif use_scholarly1:
+                                                    returned_title = result['bib']['title'].split(',')[0].strip().lower().replace('.', '').replace('-', ' ')
+                                                    current_citedby = result['num_citations']
+                                                    if hasattr(result, 'eprint_url'):
+                                                        pdf_url = result['eprint_url'].replace('https://scholar.google.com', '')
+
+                                                if target_title == returned_title:
+                                                    scholar_citations_found = True
+                                                    if total_citations is None:
+                                                        total_citations = current_citedby
                                                     else:
-                                                        pdf_url = None
+                                                        total_citations += current_citedby
 
                                                     citation_list_url = None
 
@@ -1457,11 +1525,11 @@ def btex(content):
                                     logger.warning('[btex]    Cites [{num_citations}]'.format(str(total_citations)))
 
                                 else:
-                                    update_citation_data_empty(
-                                        citation_data=citation_data,
-                                        title=item_data['title'],
-                                        year=item_data['year']
-                                    )
+                                    #update_citation_data_empty(
+                                    #    citation_data=citation_data,
+                                    #    title=item_data['title'],
+                                    #    year=item_data['year']
+                                    #)
 
                                     logger.warning(
                                         '[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
@@ -1559,13 +1627,26 @@ def btex(content):
                 google_access_valid = btex_settings['google_scholar']['active']
                 current_timestamp = time.time()
                 if google_access_valid:
-                    use_scholarly = False
+                    use_scholarly0 = False
+                    use_scholarly1 = False
                     try:
-                        import scholarly
-                        use_scholarly = True
+                        from scholary import scholarly
+                        from scholary import ProxyGenerator, DOSException, MaxTriesExceededException
+
+                        if btex_settings['google_scholar']['proxy']:
+                            pg = ProxyGenerator()
+                            pg.FreeProxies(timeout=0.5, wait_time=60)
+                            scholarly.use_proxy(pg)
+
+                        use_scholarly1 = True
 
                     except ImportError:
-                        logger.warning('[btex] Failed to import `scholarly` module.')
+                        try:
+                            import scholary.scholarly as scholarly
+                            use_scholarly0 = True
+
+                        except ImportError:
+                            logger.warning('[btex] Failed to import `scholarly` module.')
 
                     try:
                         import scholar.scholar as sc
@@ -1595,10 +1676,9 @@ def btex(content):
                             citation_update_count=str(citation_update_count)))
 
                         # Go publications through paper by paper
-
                         import random
                         pub_ids = list(range(len(publications)))
-                        # random.shuffle(pub_ids)
+                        random.shuffle(pub_ids)
                         for pub_id in pub_ids:
                             scholar_citations_found = False
                             pub = publications[pub_id]
@@ -1620,8 +1700,7 @@ def btex(content):
                                     last_fetch = time.mktime(datetime.strptime(current_citation_data['last_update'],
                                                                                '%Y-%m-%d %H:%M:%S').timetuple())
 
-                                    if btex_settings['google_scholar'][
-                                        'fetching_timeout'] + last_fetch < current_timestamp:
+                                    if btex_settings['google_scholar']['fetching_timeout'] + last_fetch < current_timestamp:
                                         citation_update_needed = True
 
                                 else:
@@ -1632,7 +1711,7 @@ def btex(content):
                                     # Fetch article from google
                                     # Form author list
 
-                                    if use_scholarly:
+                                    if use_scholarly0 or use_scholarly1:
                                         authors = []
                                         for author in pub['authors']:
                                             authors.append(' '.join(author.last()))
@@ -1640,39 +1719,76 @@ def btex(content):
                                         authors = ', '.join(authors)
 
                                         logger.warning('[btex]  Query publication [{authors}: {title}]'.format(
-                                            authors=authors.split(',')[0],
+                                            authors=authors.split(',')[0].replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ß', 's').replace(u'é', 'e'),
                                             title=pub['title'])
                                         )
 
-                                        search_query = list(
-                                            scholarly.search_pubs_query('"' + pub['title'] + '" ' + authors))
-                                        target_title = pub['title'].split(',')[0].strip().lower().replace('.',
-                                                                                                          '').replace(
-                                            '-', ' ')
+                                        query = '"' + pub['title'] + '" ' + authors
+                                        query = query.replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ß', 's').replace(u'é', 'e')
+
+                                        search_query = None
+
+                                        if use_scholarly0:
+                                            search_query = list(
+                                                scholarly.search_pubs_query(query)
+                                            )
+
+                                        elif use_scholarly1:
+                                            fetch_complete = False
+                                            for try_id in range(0, btex_settings['google_scholar']['proxy_rotations']):
+                                                try:
+                                                    search_query = list(
+                                                        scholarly.search_pubs(query)
+                                                    )
+                                                    fetch_complete = True
+                                                    break
+
+                                                except MaxTriesExceededException:
+                                                    logger.warning('[btex]  Google Scholar [MaxTriesExceededException] try [{try_id}]'.format(try_id=try_id))
+                                                    fetch_complete = False
+                                                    if btex_settings['google_scholar']['proxy']:
+                                                        pg = ProxyGenerator()
+                                                        pg.FreeProxies(timeout=0.5, wait_time=60)
+                                                        scholarly.use_proxy(pg)
+
+                                                    else:
+                                                        break
+
+                                            if not fetch_complete:
+                                                logger.warning('[btex]  Google Scholar fetch was not successful')
+
+                                        target_title = pub['title'].split(',')[0].strip().lower()\
+                                            .replace('.','').replace('-', ' ')
+
                                         if search_query:
                                             total_citations = None
                                             for result in search_query:
                                                 if result:
-                                                    returned_title = result.bib['title'].split(',')[
-                                                        0].strip().lower().replace('.', '').replace('-', ' ')
-                                                    if target_title == returned_title:
-                                                        scholar_citations_found = True
-                                                        if hasattr(result, 'citedby'):
-                                                            if total_citations is None:
-                                                                total_citations = result.citedby
-                                                            else:
-                                                                total_citations += result.citedby
+                                                    current_citedby = 0
+                                                    cluster_id = None
+                                                    pdf_url = None
 
+                                                    if use_scholarly0:
+                                                        returned_title = result.bib['title'].split(',')[0].strip().lower().replace('.', '').replace('-', ' ')
+                                                        if hasattr(result, 'citedby'):
+                                                            current_citedby = result.citedby
                                                         if hasattr(result, 'id_scholarcitedby'):
                                                             cluster_id = result.id_scholarcitedby
-                                                        else:
-                                                            cluster_id = None
-
                                                         if hasattr(result, 'eprint'):
-                                                            pdf_url = result.bib['eprint'].replace(
-                                                                'https://scholar.google.com', '')
+                                                            pdf_url = result.bib['eprint'].replace('https://scholar.google.com', '')
+
+                                                    elif use_scholarly1:
+                                                        returned_title = result['bib']['title'].split(',')[0].strip().lower().replace('.', '').replace('-', ' ')
+                                                        current_citedby = result['num_citations']
+                                                        if hasattr(result, 'eprint_url'):
+                                                            pdf_url = result['eprint_url'].replace('https://scholar.google.com', '')
+
+                                                    if target_title == returned_title:
+                                                        scholar_citations_found = True
+                                                        if total_citations is None:
+                                                            total_citations = current_citedby
                                                         else:
-                                                            pdf_url = None
+                                                            total_citations += current_citedby
 
                                                         citation_list_url = None
 
@@ -1724,11 +1840,11 @@ def btex(content):
                                         )
 
                                     else:
-                                        update_citation_data_empty(
-                                            citation_data=citation_data,
-                                            title=pub['title'],
-                                            year=pub['year']
-                                        )
+                                        #update_citation_data_empty(
+                                        #    citation_data=citation_data,
+                                        #    title=pub['title'],
+                                        #    year=pub['year']
+                                        #)
 
                                         logger.warning(
                                             '[btex]    Nothing returned, article might not be indexed by Google or your access quota is exceeded!')
@@ -1738,13 +1854,15 @@ def btex(content):
                                         citation_data=citation_data
                                     )
 
-                                    # Wait after each query random time in order to avoid flooding Google.
-                                    wait_time = randint(btex_settings['google_scholar']['fetch_item_timeout'][0],
-                                                        btex_settings['google_scholar']['fetch_item_timeout'][1])
+                                    if not (use_scholarly1 and btex_settings['google_scholar']['proxy']):
+                                        # Wait after each query random time in order to avoid flooding Google.
+                                        wait_time = randint(
+                                            btex_settings['google_scholar']['fetch_item_timeout'][0],
+                                            btex_settings['google_scholar']['fetch_item_timeout'][1]
+                                        )
 
-                                    logger.warning(
-                                        '[btex]  Sleeping [{wait_time} sec]'.format(wait_time=str(wait_time)))
-                                    sleep(wait_time)
+                                        logger.warning('[btex]  Sleeping [{wait_time} sec]'.format(wait_time=str(wait_time)))
+                                        sleep(wait_time)
 
                 # Inject citation information to the publication list
                 for pub in publications:
@@ -1988,10 +2106,15 @@ def update_citation_data_empty(citation_data, title, year):
 def load_citation_data(filename):
     if os.path.isfile(filename):
         try:
-            with open(filename, 'r') as field:
-                citation_data = yaml.load(field)
+            from distutils.version import LooseVersion
+            if LooseVersion(str(yaml.__version__)) >= "5.1":
+                with open(filename, 'r') as field:
+                    citation_data = yaml.load(field, Loader=yaml.FullLoader)
+            else:
+                with open(filename, 'r') as field:
+                    citation_data = yaml.load(field)
 
-            if 'data' in citation_data:
+            if citation_data and 'data' in citation_data:
                 citation_data = citation_data['data']
 
             return citation_data
@@ -2109,7 +2232,6 @@ def move_resources(gen):
         js_target = os.path.join(gen.output_path, 'theme', 'js', 'btex.min.js')
         if not os.path.exists(os.path.join(gen.output_path, 'theme', 'js')):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
-
         if not os.path.exists(os.path.join(gen.output_path, 'theme', 'css')):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'css'))
 
@@ -2131,6 +2253,8 @@ def move_resources(gen):
         js_target = os.path.join(gen.output_path, 'theme', 'js', 'btex.js')
         if not os.path.exists(os.path.join(gen.output_path, 'theme', 'js')):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
+        if not os.path.exists(os.path.join(gen.output_path, 'theme', 'css')):
+            os.makedirs(os.path.join(gen.output_path, 'theme', 'css'))
 
         for path in plugin_paths:
             css_source = os.path.join(path, 'pelican-btex', 'css', 'btex.css')
@@ -2205,6 +2329,12 @@ def init_default_config(pelican):
     if 'BTEX_SCHOLAR_ACTIVE' in pelican.settings:
         btex_settings['google_scholar']['active'] = pelican.settings['BTEX_SCHOLAR_ACTIVE']
 
+    if 'BTEX_SCHOLAR_USE_PROXY' in pelican.settings:
+        btex_settings['google_scholar']['proxy'] = pelican.settings['BTEX_SCHOLAR_USE_PROXY']
+
+    if 'BTEX_SCHOLAR_PROXY_ROTATIONS' in pelican.settings:
+        btex_settings['google_scholar']['proxy_rotations'] = pelican.settings['BTEX_SCHOLAR_PROXY_ROTATIONS']
+
     if 'BTEX_SCHOLAR_FETCH_TIMEOUT' in pelican.settings:
         btex_settings['google_scholar']['fetching_timeout'] = pelican.settings['BTEX_SCHOLAR_FETCH_TIMEOUT']
 
@@ -2232,3 +2362,212 @@ def register():
 
     signals.article_generator_finalized.connect(move_resources)
     signals.content_object_init.connect(btex)
+
+def update_based_on_author(author_name, bibtex_filename, cache_filename, use_proxy=None):
+    bib = parse_bibtex_file(bibtex_filename)
+
+    citation_data = load_citation_data(filename=cache_filename)
+
+    from scholarly import scholarly
+    from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+
+    if use_proxy or btex_settings['google_scholar']['proxy']:
+        pg = ProxyGenerator()
+        pg.FreeProxies(timeout=0.5, wait_time=60)
+        scholarly.use_proxy(pg)
+
+    search_query = scholarly.search_author(author_name)
+    author_info = scholarly.fill(next(search_query))
+
+    for pub in bib:
+        current_publication_title = pub['title']
+
+        pub_found = False
+        pub_info = None
+        for author_pub in author_info['publications']:
+            if author_pub['bib']['title'].lower() == current_publication_title.lower():
+                pub_found = True
+                pub_info = author_pub
+                break
+
+        if pub_found:
+            citation_found = False
+            citation_info = None
+            for citation_pub in citation_data:
+                if citation_pub['title'].lower() == current_publication_title.lower():
+                    citation_found = True
+                    citation_info = citation_pub
+                    break
+
+            if citation_found:
+                citation_pub['scholar']['total_citations'] = pub_info['num_citations']
+                current_timestamp = time.time()
+                citation_pub['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+
+            else:
+                update_citation_data(
+                    citation_data=citation_data,
+                    title=pub['title'],
+                    year=pub['year'],
+                    insert_new=True,
+                    cluster_id=None,
+                    total_citations=pub_info['num_citations'],
+                    pdf_url=None,
+                    citation_list_url=pub_info['citedby_url'] if 'citedby_url' in pub_info else None
+                )
+
+        if pub_found:
+            print('updated', '[' + current_publication_title + ']', pub_info['num_citations'])
+        else:
+            print('skipped', '[' + current_publication_title + ']')
+
+    save_citation_data(filename=args.cache_filename, citation_data=citation_data)
+
+def update_based_on_source(source_name, bibtex_filename, cache_filename, use_proxy=None):
+
+    if ';' in bibtex_filename:
+        bibtex_filename_parts = bibtex_filename.split(';')
+        bib = []
+        for f in bibtex_filename_parts:
+            bib += parse_bibtex_file(f)
+    else:
+        bib = parse_bibtex_file(bibtex_filename)
+
+    citation_data = load_citation_data(filename=cache_filename)
+
+    from scholarly import scholarly
+    from scholarly import ProxyGenerator, DOSException, MaxTriesExceededException
+
+    if use_proxy or btex_settings['google_scholar']['proxy']:
+        pg = ProxyGenerator()
+        pg.FreeProxies(timeout=0.5, wait_time=60)
+        scholarly.use_proxy(pg)
+
+    query_url = ('/scholar?as_q=&as_epq=&as_oq=&as_eq=&as_occt=any&as_sauthors=&'
+                 'as_publication=%22'+source_name+'%22&as_ylo=&as_yhi=&hl=en&as_sdt=0%2C5')
+
+    search_query = scholarly.search_pubs_custom_url(query_url)
+    for result in search_query:
+        current_bib = result['bib']
+        current_bib_title = current_bib['title'].lower()
+
+        # Remove period from the end
+        if current_bib_title[-1] == '.':
+            current_bib_title = current_bib_title[:-1]
+
+        pub_found = False
+        for pub in bib:
+            current_publication_title = pub['title'].lower()
+            # Remove period from the end
+            if current_publication_title[-1] == '.':
+                current_publication_title = current_publication_title[:-1]
+
+            if current_bib_title == current_publication_title:
+                pub_found = True
+                citation_found = False
+                for citation_pub in citation_data:
+                    citation_pub_title = citation_pub['title'].lower()
+                    # Remove period from the end
+                    if citation_pub_title[-1] == '.':
+                        citation_pub_title = citation_pub_title[:-1]
+
+                    if citation_pub_title == current_publication_title:
+                        citation_found = True
+                        citation_pub['scholar']['total_citations'] = result['num_citations']
+                        current_timestamp = time.time()
+                        citation_pub['last_update'] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_timestamp))
+
+                if not citation_found:
+                    update_citation_data(
+                        citation_data=citation_data,
+                        title=pub['title'],
+                        year=pub['year'],
+                        insert_new=True,
+                        cluster_id=None,
+                        total_citations=result['num_citations'],
+                        pdf_url=None,
+                        citation_list_url=result['citedby_url'] if 'citedby_url' in result else None
+                    )
+                break
+
+        if pub_found:
+            print('updated', '[' + current_bib['title'] + ']', result['num_citations'])
+        #else:
+        #    print('skipped', '[' + current_bib['title'] + ']')
+
+    save_citation_data(filename=args.cache_filename, citation_data=citation_data)
+
+
+if __name__ == '__main__':
+    import argparse
+    from argparse import RawTextHelpFormatter
+    import textwrap
+
+    parser = argparse.ArgumentParser(
+        prefix_chars='-+',
+        description=textwrap.dedent(
+            '''\
+            pelican-btex
+            ===========================================                        
+            '''
+        ),
+        formatter_class=RawTextHelpFormatter
+
+    )
+
+    parser.add_argument(
+        '--author',
+        help='Author name',
+        dest='author_name',
+        required=False,
+        type=str
+    )
+
+    parser.add_argument(
+        '--source',
+        help='Source name',
+        dest='source_name',
+        required=False,
+        type=str
+    )
+
+    parser.add_argument(
+        '--use_proxy',
+        help='Use proxy',
+        dest='use_proxy',
+        action = 'store_true'
+    )
+
+    parser.add_argument(
+        '--bib',
+        help='bibtex filename(s), separate multiple with ; ',
+        dest='bibtex_filename',
+        required=False,
+        type=str
+    )
+
+    parser.add_argument(
+        '--cache',
+        help='cache filename to store citations',
+        dest='cache_filename',
+        required=False,
+        type=str
+    )
+
+    args = parser.parse_args()
+
+    if args.bibtex_filename and args.cache_filename and args.author_name:
+        update_based_on_author(
+            author_name=args.author_name,
+            bibtex_filename=args.bibtex_filename,
+            cache_filename=args.cache_filename,
+            use_proxy=args.use_proxy
+        )
+
+    elif args.bibtex_filename and args.cache_filename and args.source_name:
+        update_based_on_source(
+            source_name=args.source_name,
+            bibtex_filename=args.bibtex_filename,
+            cache_filename=args.cache_filename,
+            use_proxy=args.use_proxy
+        )

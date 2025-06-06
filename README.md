@@ -211,6 +211,8 @@ Parameters for the plugin can be set in  `pelicanconf.py' with following paramet
 | BTEX_SCHOLAR_ACTIVE       | Boolean   | True          | Activates Google Scholar citation count fetching  |
 | BTEX_SCHOLAR_FETCH_TIMEOUT| Number    | 60*60*24*7    | Amount of seconds required between queries to Scholar per entry |
 | BTEX_SCHOLAR_MAX_ENTRIES_PER_BATCH | Number    | 10       | How many queries are made per publication list generation |
+| BTEX_SCHOLAR_USE_PROXY    | Boolean   | False         | Use freeproxies during Google Scholar fetching to avoid IP blocking, requires scholarly package (version >= 1.7.2) |
+| BTEX_SCHOLAR_PROXY_ROTATIONS | Number | 10            | Amount of retries to find working proxy |
 | BTEX_MINIFIED             | Boolean   | True          | Do we use minified CSS and JS files. Disable in case of debugging.  |
 | BTEX_GENERATE_MINIFIED    | Boolean   | False         | CSS and JS files are minified each time, Enable in case of development.   |
 | BTEX_USE_FONTAWESOME_CDN  | Boolean   | True          | Include CDN version of Fontawesome, disable if site template already includes this | 
@@ -218,4 +220,4 @@ Parameters for the plugin can be set in  `pelicanconf.py' with following paramet
 
 ## Getting citation counts 
 
-This plugin is fetching citation counts for articles from Google by using [scholar.py](https://github.com/ckreibich/scholar.py). Google has query limits and exceeding these limits will blacklist your IP for a while. The plugin will try to minimize amount of queries. All query results are stored in the cache file at the root of the Pelican project (`btex_citation_cache.yaml`, or set file with `data-citations`). Timestamps are used to decide which articles needs update, and only predefined amount of queries are made per session. There is also random waiting time assigned between queries. This procedure might be problematic at the beginning when large amount of articles are inserted, as only small portion is queried at each session. However, once all articles are queried the plugins should maintain citation count rather close to the one reported by Google Scholar with minimal queries.    
+This plugin is fetching citation counts for articles from Google by using [scholarly](https://github.com/scholarly-python-package/scholarly) python package. As a fallback, the plugin uses [scholar.py](https://github.com/ckreibich/scholar.py). Google has query limits and exceeding these limits will blacklist your IP for a while. The plugin will try to minimize amount of queries and to use proxies when making queries. All query results are stored in the cache file at the root of the Pelican project (`btex_citation_cache.yaml`, or set file with `data-citations`). Timestamps are used to decide which articles needs update, and only predefined amount of queries are made per session.     
