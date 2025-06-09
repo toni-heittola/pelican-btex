@@ -2906,7 +2906,7 @@ def move_resources(gen):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'css'))
 
         for path in plugin_paths:
-            css_source = os.path.join(path, 'pelican-btex', 'css.min', 'btex.min.css')
+            css_source = os.path.join(path, 'pelican-btex', 'css.min', 'btex_'+btex_settings['template-mode']+'.min.css')
             js_source = os.path.join(path, 'pelican-btex', 'js.min', 'btex.min.js')
 
             if os.path.isfile(css_source):  # and not os.path.isfile(css_target):
@@ -2927,7 +2927,7 @@ def move_resources(gen):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'css'))
 
         for path in plugin_paths:
-            css_source = os.path.join(path, 'pelican-btex', 'css', 'btex.css')
+            css_source = os.path.join(path, 'pelican-btex', 'css', 'btex_'+btex_settings['template-mode']+'.css')
             js_source = os.path.join(path, 'pelican-btex', 'js', 'btex.js')
 
             if os.path.isfile(css_source):  # and not os.path.isfile(css_target):
