@@ -1038,7 +1038,7 @@ def get_default_template(options):
                                 {%if show_label and not show_authors %}
                                 <small class="{{ item.type_label_css }}">{{ item.type_label_short }}</small>
                                 {% endif %}    
-                                <h4 class="list-group-item-heading">{{item.title}}</h4>
+                                <h4 class="list-group-item-heading btex-title">{{item.title}}</h4>
                             </div>
                         </div>
                         {%if show_label or show_authors %}
@@ -1050,7 +1050,7 @@ def get_default_template(options):
                             {% endif %}
                             {%if show_authors %}
                             <div class="col-xs-10">
-                                <span class="authors">{{item.authors_text}}</span>
+                                <span class="btex-authors">{{item.authors_text}}</span>
                             </div>
                             {% endif %}
                         </div>
@@ -1061,34 +1061,34 @@ def get_default_template(options):
             </div>
             """
         elif template_mode == 'bs5':
-                template += """
-                <div class="list-group btex-news-container">
-                {% for item in publications %}
-                    {% if loop.index <= item_count %}
-                    <a class="list-group-item" href="{{target_page}}#{{item.key}}" title="Read more...">
-                        <div class="row">
-                            <div class="col-12">
-                                {%if show_label and not show_authors %}
-                                <small class="{{ item.type_label_css }}">{{ item.type_label_short }}</small>
-                                {% endif %}    
-                                <h5 class="list-group-item-heading">{{item.title}}</h5>
-                            </div>
+            template += """
+            <div class="list-group2 btex-news-container">
+            {% for item in publications %}
+                {% if loop.index <= item_count %}
+                <a class="list-group-item2 link-underline link-underline-opacity-0" href="{{target_page}}#{{item.key}}" title="Read more...">
+                    <div class="row">
+                        <div class="col-12">
+                            {%if show_label and not show_authors %}
+                            <small class="{{ item.type_label_css }}">{{ item.type_label_short }}</small>
+                            {% endif %}    
+                            <h5 class="list-group-item-heading btex-title">{{item.title}}</h5>
                         </div>
-                        {%if show_label or show_authors %}
-                        <div class="row">
-                            {%if show_label and show_authors%}
-                            <div class="col-2"><span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span></div>
-                            {% endif %}
-                            {%if show_authors %}
-                            <div class="col-10"><span class="authors">{{item.authors_text}}</span></div>
-                            {% endif %}
-                        </div>
+                    </div>
+                    {%if show_label or show_authors %}
+                    <div class="row pb-2">
+                        {%if show_label and show_authors%}
+                        <div class="col-2"><span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span></div>
                         {% endif %}
-                        </a>                        
+                        {%if show_authors %}
+                        <div class="{%if show_label and show_authors%}col-10{% else %}col-12{% endif %}"><span class="btex-authors">{{item.authors_text}}</span></div>
+                        {% endif %}
+                    </div>
                     {% endif %}
-                {% endfor %}
-                </div>
-                """
+                    </a>                        
+                {% endif %}
+            {% endfor %}
+            </div>
+            """
     return template
 
 
