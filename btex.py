@@ -507,7 +507,7 @@ def get_default_template(options):
                                         </span>
                                         {% endif %}
                                         </p>
-                                        <button type="button" class="btn btn-default btn-xs" data-bs-toggle="collapse" data-bs-parent="#accordion" data-bs-target="#collapse{{ item.key }}" aria-expanded="true" aria-controls="collapse{{ item.key }}">
+                                        <button type="button" class="btn btn-default btn-xs" data-bs-toggle="collapse" data-bs-target="#collapse{{ item.key }}" aria-expanded="true" aria-controls="collapse{{ item.key }}">
                                         <i class="fa fa-caret-down"></i> Read more...</button>
                                     </div>
                                     <div class="col-3">
@@ -523,7 +523,7 @@ def get_default_template(options):
                                     </div>
                                 </div>
                             </div>
-                            <div id="collapse{{ item.key }}" class="panel-collapse collapse pb-3" role="tabpanel" aria-labelledby="heading{{ item.key }}">
+                            <div id="collapse{{ item.key }}" class="panel-collapse collapse pb-3" data-bs-parent="#accordion" role="tabpanel" aria-labelledby="heading{{ item.key }}">
                                 <div class="card p-2">
                                     <h4>{{item.title}}</h4>
                                     {% if item.abstract %}
