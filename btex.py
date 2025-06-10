@@ -297,8 +297,8 @@ def parse_bibtex_file(src_filename):
 
 def boolean(argument):
     """Conversion function for yes/no True/False."""
-    value = directives.choice(argument, ('yes', 'true', 'True', 'no', 'False'))
-    return value in ('yes', 'True', 'true')
+    value = directives.choice(argument, ('yes', 'true', 'True', 'no', 'False', 'false', True, False))
+    return value in ('yes', 'True', 'true', True)
 
 
 def boolean_string(value):
@@ -333,7 +333,6 @@ def get_default_template(options):
             template += ')</span>'
             template += '</small>'
             template += '</div></div>'
-
         elif template_mode == 'bs5':
             template += '<div class="card p-3">'
             template += '<span>Publications: {{ meta.publications }} <small class="text-muted">( {{ meta.types_html_list}} )</small></span>'
@@ -518,8 +517,8 @@ def get_default_template(options):
                                             {% if item.demo %}<a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
                                             {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
                                             {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>{% endif %}
-                                            {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
-                                            {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                                            {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                                            {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -549,13 +548,13 @@ def get_default_template(options):
                                                     <a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2 text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>
                                                 {% endif %}
                                                 {% if item.slides %}
-                                                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>
+                                                    <a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>
                                                 {% endif %}
                                                 {% if item.poster %}
-                                                    <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
+                                                    <a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>
                                                 {% endif %}
                                                 {% if item.webpublication %}
-                                                    <a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>
+                                                    <a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>
                                                 {% endif %}
                                             </div>
                                             <div class="btn-group" role="group">
@@ -563,10 +562,10 @@ def get_default_template(options):
                                                     <a href="{{item.toolbox}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>
                                                 {% endif %}
                                                 {% if item.data1 %}
-                                                    <a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>
+                                                    <a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>
                                                 {% endif %}
                                                 {% if item.data2 %}
-                                                    <a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>
+                                                    <a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>
                                                 {% endif %}
                                                 {% if item.code1 %}
                                                     <a href="{{item.code1.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code1.title}}"><i class="fa fa-file-code-o"></i> {{item.code1.title}}</a>
@@ -581,16 +580,16 @@ def get_default_template(options):
                                                     <a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>
                                                 {% endif %}
                                                 {% if item.link1 %}
-                                                    <a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>
+                                                    <a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>
                                                 {% endif %}
                                                 {% if item.link2 %}
-                                                    <a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>
+                                                    <a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>
                                                 {% endif %}
                                                 {% if item.link3 %}
-                                                    <a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>
+                                                    <a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>
                                                 {% endif %}
                                                 {% if item.link4 %}
-                                                    <a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>
+                                                    <a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -689,8 +688,10 @@ def get_default_template(options):
                 {% if (year|int)>(first_visible_year|int) %}
                     <h3>{{(year|int)}}</h3>
                     {% for item in year_group|sort(attribute='year') %}
-                        <div class="row publication-item pb-2">
-                            <div class="col-1"><span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span></div>
+                        <div class="row publication-item">
+                            <div class="col-1">
+                                <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
+                            </div>
                             <div class="col-8">
                                 {{item.text}}
                                 {% if item.award %}<span class="label label-success">{{item.award}}</span> {% endif %}
@@ -712,10 +713,10 @@ def get_default_template(options):
                                         <a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>
                                     {% endif %}
                                     {% if item.data1 %}
-                                        <a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
+                                        <a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
                                     {% endif %}
                                     {% if item.data2 %}
-                                        <a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
+                                        <a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
                                     {% endif %}
                                     {% if item.code1 %}
                                         <a href="{{item.code1.url}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="{{item.code1.title}}" data-placement="bottom"><i class="fa fa-file-code-o"></i></a>
@@ -997,95 +998,97 @@ def get_default_template(options):
             """
 
     elif options['template'] == 'minimal':
-        if template_mode == 'bs3':
-            template += """
-                {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    {% if (year|int)>(first_visible_year|int) %}
-                        <strong class="text-muted">{{year}}</strong>
-                        {% for item in year_group|sort(attribute='year') %}
-                            <div class="row">
-                                <div class="col-md-1 col-sm-2">
-                                    <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
-                                </div>
-                                <div class="col-md-11 col-sm-10">
-                                    <p style="text-align:left">{{item.text}}
-                                    {% if item.award %}<span class="label label-success">{{item.award}}</span>{% endif %}
-                                    {% if item.cites %}
-                                    <span title="Number of citations" class="badge">{{ item.cites }} {% if item.cites==1 %}cite{% else %}cites{% endif %}</span>
-                                    {% endif %}
-                                    {% if item.pdf %}
-                                        <a href="{{item.pdf}}" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Download pdf" data-placement="bottom"><span class="glyphicon glyphicon-file"></span></a>
-                                    {% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endfor %}
-            """
-        elif template_mode == 'bs5':
-            template += """
-                {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    {% if (year|int)>(first_visible_year|int) %}
-                        <strong class="text-muted">{{year}}</strong>
-                        {% for item in year_group|sort(attribute='year') %}
-                            <div class="row">
-                                <div class="col-1">
-                                    <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
-                                </div>
-                                <div class="col-11">
-                                    <p style="text-align:left">{{item.text}}
-                                    {% if item.award %}<span class="label label-success">{{item.award}}</span>{% endif %}
-                                    {% if item.cites %}<span title="Number of citations" class="badge">{{ item.cites }} {% if item.cites==1 %}cite{% else %}cites{% endif %}</span>{% endif %}
-                                    {% if item.pdf %}
-                                        <a href="{{item.pdf}}" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Download pdf" data-placement="bottom"><span class="glyphicon glyphicon-file"></span></a>
-                                    {% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endfor %}
-            """
 
+        template += """
+            {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
+                {% if (year|int)>(first_visible_year|int) %}
+                    <strong class="text-muted">{{year}}</strong>
+                    {% for item in year_group|sort(attribute='year') %}
+                        <div class="row">
+                            {%if show_label and show_authors %}
+                            <div class="col-md-1 col-sm-2">
+                                <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="{%if not show_label and show_authors %}col-md-12 col-sm-11{% else %}col-md-11 col-sm-10{% endif %}">
+                                <p style="text-align:left">{{item.text}}
+                                {% if item.award %}<span class="label label-success">{{item.award}}</span>{% endif %}
+                                {% if item.cites %}
+                                <span title="Number of citations" class="badge">{{ item.cites }} {% if item.cites==1 %}cite{% else %}cites{% endif %}</span>
+                                {% endif %}
+                                {% if item.pdf %}
+                                    <a href="{{item.pdf}}" style="text-decoration:none;border-bottom:0;padding-bottom:5px" rel="tooltip" title="Download pdf" data-placement="bottom"><span class="glyphicon glyphicon-file"></span></a>
+                                {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        """
     elif options['template'] == 'news':
         if template_mode == 'bs3':
             template += """
             <div class="list-group btex-news-container">
-            {% for item in publications %}
-                {% if loop.index <= item_count %}
-                <a class="list-group-item" href="{{target_page}}#{{item.key}}" title="Read more...">
-                    <div class="row">
-                        <div class="col-sm-12"><h4 class="list-group-item-heading">{{item.title}}</h4></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-2"><span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span></div>
-                        <div class="col-xs-10"><span class="authors">{{item.authors_text}}</span></div>
-                    </div>
-                </a>
-                {% endif %}
-            {% endfor %}
+                {% for item in publications %}
+                    {% if loop.index <= item_count %}
+                    <a class="list-group-item" href="{{target_page}}#{{item.key}}" title="Read more...">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                {%if show_label and not show_authors %}
+                                <small class="{{ item.type_label_css }}">{{ item.type_label_short }}</small>
+                                {% endif %}    
+                                <h4 class="list-group-item-heading">{{item.title}}</h4>
+                            </div>
+                        </div>
+                        {%if show_label or show_authors %}
+                        <div class="row">
+                            {%if show_label and show_authors%}
+                            <div class="col-xs-2">
+                                <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
+                            </div>
+                            {% endif %}
+                            {%if show_authors %}
+                            <div class="col-xs-10">
+                                <span class="authors">{{item.authors_text}}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}                            
+                    </a>
+                    {% endif %}
+                {% endfor %}
             </div>
             """
         elif template_mode == 'bs5':
-            template += """
-            <div class="list-group btex-news-container pb-3">
-            {% for item in publications %}
-                {% if loop.index <= item_count %}
-                <a class="list-group-item" href="{{target_page}}#{{item.key}}" title="Read more...">
-                    <div class="row">
-                        <div class="col-12"><h5 class="list-group-item-heading">{{item.title}}</h5></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-1"><span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span></div>
-                        <div class="col-11"><span class="authors">{{item.authors_text}}</span></div>
-                    </div>
-                </a>
-                {% endif %}
-            {% endfor %}
-            </div>
-            """
-
+                template += """
+                <div class="list-group btex-news-container">
+                {% for item in publications %}
+                    {% if loop.index <= item_count %}
+                    <a class="list-group-item" href="{{target_page}}#{{item.key}}" title="Read more...">
+                        <div class="row">
+                            <div class="col-12">
+                                {%if show_label and not show_authors %}
+                                <small class="{{ item.type_label_css }}">{{ item.type_label_short }}</small>
+                                {% endif %}    
+                                <h4 class="list-group-item-heading">{{item.title}}</h4>
+                            </div>
+                        </div>
+                        {%if show_label or show_authors %}
+                        <div class="row">
+                            {%if show_label and show_authors%}
+                            <div class="col-2"><span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span></div>
+                            {% endif %}
+                            {%if show_authors %}
+                            <div class="col-10"><span class="authors">{{item.authors_text}}</span></div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        </a>                        
+                    {% endif %}
+                {% endfor %}
+                </div>
+                """
     return template
 
 
@@ -1248,8 +1251,8 @@ def get_default_item_template(options):
                                     {% if item.demo %}<a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                                     {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                                     {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i></a>{% endif %}
-                                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
-                                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
                                     <button class="btn btn-default btn-xs" type="button" data-bs-parent="#btex-items-accordion" data-bs-toggle="collapse" data-bs-target="#collapse{{ item.key }}{{ uuid }}" aria-expanded="true" aria-controls="collapse{{ item.key }}{{ uuid }}">
                                         <i class="fa fa-caret-down"></i></button>
                                 </div>
@@ -1268,24 +1271,24 @@ def get_default_item_template(options):
                             {% if item.award %}<p><strong>Awards:</strong> {{item.award}}</p>{% endif %}
                             {% if item.cites %}<p><strong>Cites:</strong> {{item.cites}} (<a href="{{ item.citation_url }}" target="_blank">see at Google Scholar</a>)</p>{% endif %}
                             <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#bibtex{{ item.key }}{{ uuid }}"><i class="fa fa-file-text-o"></i> Bibtex</button>
-                                {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2 text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>{% endif %}
-                                {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>{% endif %}
-                                {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
-                                {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
+                                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#bibtex{{ item.key }}{{ uuid }}"><i class="fa fa-file-text-o"></i> Bibtex</button>
+                                {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>{% endif %}
+                                {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-file-powerpoint-o"></i> Slides</a>{% endif %}
+                                {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
+                                {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
                             </div>
                             <div class="btn-group">
                             {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>{% endif %}
-                            {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
-                            {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
+                            {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
+                            {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
                             {% if item.code1 %}<a href="{{item.code1.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code1.title}}"><i class="fa fa-file-code-o"></i> {{item.code1.title}}</a>{% endif %}
                             {% if item.code2 %}<a href="{{item.code2.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code2.title}}"><i class="fa fa-file-code-o"></i> {{item.code2.title}}</a>{% endif %}
                             {% if item.demo %}<a href="{{item.demo}}" class="btn btn-sm btn-primary iframe-demo btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
                             {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
-                            {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
-                            {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
-                            {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
-                            {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
+                            {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
+                            {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
+                            {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
+                            {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
                             </div>
                         </div>
                     </div>
@@ -1469,14 +1472,14 @@ def get_default_item_template(options):
                 <div class="col-md-3">
                     <div class="btn-group pull-right">                     
                         {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>{% endif %}
-                        {% if item.slides %}<a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i></a>{% endif %}
-                        {% if item.poster %}<a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i></a>{% endif %}   
+                        {% if item.slides %}<a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i></a>{% endif %}
+                        {% if item.poster %}<a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i></a>{% endif %}   
                         {% if item.video %}<a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>{% endif %}                    
                         {% if item.demo %}<a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                         {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                         {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i></a>{% endif %}
-                        {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
-                        {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
+                        {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                        {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>
                         {% endif %}
                         {% if item.git1 or item.git2 or item.git3 or item.git4 %}<button type="button" class="btn btn-xs btn-success" data-toggle="collapse" data-bs-parent="#btex-items-accordion" data-bs-target="#collapse{{ item.key }}{{ uuid }}" aria-expanded="true" aria-controls="collapse{{ item.key }}{{ uuid }}"><i class="fa fa-git"></i></button>{% endif %}
                         {% if item.abstract or item.keywords %}<button class="btn btn-default btn-xs" type="button" data-bs-parent="#btex-items-accordion" data-bs-toggle="collapse" data-bs-target="#collapse{{ item.key }}{{ uuid }}" aria-expanded="true" aria-controls="collapse{{ item.key }}{{ uuid }}"><i class="fa fa-caret-down"></i></button>{% endif %}
@@ -1491,15 +1494,15 @@ def get_default_item_template(options):
                 <div class="btn-group">
                     <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#bibtex{{ item.key }}{{ uuid }}"><i class="fa fa-file-text-o"></i> Bib</button>
                     {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2 text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>{% endif %}
-                    {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>{% endif %}
-                    {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
+                    {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>{% endif %}
+                    {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
                     {% if item.video %}<a href="{{item.video}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera"></i> Video</a>{% endif %}                
-                    {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
+                    {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
                 </div>
                 <div class="btn-group">
                     {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>{% endif %}
-                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
-                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
+                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
+                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
                     {% if item.code1 %}<a href="{{item.code1.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code1.title}}"><i class="fa fa-file-code-o"></i> {{item.code1.title}}</a>{% endif %}
                     {% if item.code2 %}<a href="{{item.code2.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code2.title}}"><i class="fa fa-file-code-o"></i> {{item.code2.title}}</a>{% endif %}
                     {% if item.git1 %}<a href="{{item.git1.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.git1.title}}"><i class="fa fa-git"></i> {{item.git1.title}}</a>{% endif %}    
@@ -1508,10 +1511,10 @@ def get_default_item_template(options):
                     {% if item.git4 %}<a href="{{item.git4.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.git4.title}}"><i class="fa fa-git"></i> {{item.git4.title}}</a>{% endif %}                
                     {% if item.demo %}<a href="{{item.demo}}" class="btn btn-sm btn-primary iframe-demo btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
                     {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
-                    {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
-                    {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
-                    {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
-                    {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
+                    {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
+                    {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
+                    {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
+                    {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
                 </div>
             </div>
             <!-- Modal -->
@@ -1670,14 +1673,14 @@ def get_default_item_template(options):
                 <div class="col-md-3">
                     <div class="btn-group pull-right">                    
                         {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>{% endif %}
-                        {% if item.slides %}<a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Slides</a>{% endif %}
-                        {% if item.poster %}<a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Poster" data-placement="bottom"><i class="fa fa-file-picture-o fa-1x"></i> Poster</a>{% endif %}                    
+                        {% if item.slides %}<a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Slides</a>{% endif %}
+                        {% if item.poster %}<a href="{{item.poster}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="Poster" data-placement="bottom"><i class="fa fa-file-picture-o fa-1x"></i> Poster</a>{% endif %}                    
                         {% if item.video %}<a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>{% endif %}                      
                         {% if item.demo %}<a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                         {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                         {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i></a>{% endif %}
-                        {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
-                        {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                        {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                        {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
                         {% if item.abstract or item.keywords %}<button type="button" class="btn btn-default btn-xs" data-bs-toggle="collapse" data-bs-parent="#btex-items-accordion" data-bs-target="#collapse{{ item.key }}{{ uuid }}" aria-expanded="true" aria-controls="collapse{{ item.key }}{{ uuid }}"><i class="fa fa-caret-down"></i></button>{% endif %}
                     </div>
                 </div>            
@@ -1699,15 +1702,15 @@ def get_default_item_template(options):
                 {% endif %}
                 <div class="btn-group">
                     {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2 text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>{% endif %}
-                    {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>{% endif %}
-                    {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
+                    {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>{% endif %}
+                    {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
                     {% if item.video %}<a href="{{item.video}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera"></i> Video</a>{% endif %}
-                    {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
+                    {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
                 </div>
                 <div class="btn-group">
                     {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>{% endif %}
-                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
-                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
+                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
+                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
                     {% if item.code1 %}<a href="{{item.code1.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code1.title}}"><i class="fa fa-file-code-o"></i> {{item.code1.title}}</a>{% endif %}
                     {% if item.code2 %}<a href="{{item.code2.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code2.title}}"><i class="fa fa-file-code-o"></i> {{item.code2.title}}</a>{% endif %}
                     {% if item.git1 %}<a href="{{item.git1.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.git1.title}}"><i class="fa fa-git"></i> {{item.git1.title}}</a>{% endif %}    
@@ -1716,10 +1719,10 @@ def get_default_item_template(options):
                     {% if item.git4 %}<a href="{{item.git4.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.git4.title}}"><i class="fa fa-git"></i> {{item.git4.title}}</a>{% endif %}                 
                     {% if item.demo %}<a href="{{item.demo}}" class="btn btn-sm btn-primary iframe-demo btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
                     {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
-                    {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
-                    {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
-                    {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
-                    {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
+                    {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
+                    {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
+                    {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
+                    {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
                 </div>
             </div>    
             """
@@ -1885,13 +1888,13 @@ def get_default_item_template(options):
                 <div class="col-md-3">
                     <div class="btn-group pull-right">                    
                         {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-xs btn-warning btn-btex text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-pdf-o fa-1x"></i> PDF</a>{% endif %}
-                        {% if item.slides %}<a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Slides</a>{% endif %}
+                        {% if item.slides %}<a href="{{item.slides}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="Slides" data-placement="bottom"><i class="fa fa-picture-o fa-1x"></i> Slides</a>{% endif %}
                         {% if item.video %}<a href="{{item.video}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera fa-1x"></i></a>{% endif %}           
                         {% if item.demo %}<a href="{{item.demo}}" class="btn btn-xs btn-primary iframe-demo btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                         {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-xs btn-primary btn-btex" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i></a>{% endif %}
                         {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-xs btn-success btn-btex" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i></a>{% endif %}
-                        {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
-                        {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                        {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data1.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
+                        {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-xs btn-info btn-btex text-white" rel="tooltip" title="{{item.data2.title}}" data-placement="bottom"><i class="fa fa-database"></i></a>{% endif %}
                         <button type="button" class="btn btn-default btn-xs" data-bs-toggle="collapse" data-bs-parent="#btex-items-accordion" href="#collapse{{ item.key }}{{ uuid }}" aria-expanded="true" aria-controls="collapse{{ item.key }}{{ uuid }}"><i class="fa fa-caret-down"></i></button>                         
                     </div>
                 </div>            
@@ -1931,15 +1934,15 @@ def get_default_item_template(options):
                 {% if item.cites %}<p><strong>Cites:</strong> {{item.cites}} (<a href="{{ item.citation_url }}" target="_blank">see at Google Scholar</a>)</p>{% endif %}
                 <div class="btn-group">
                     {% if item.pdf %}<a href="{{item.pdf}}" class="btn btn-sm btn-warning btn-btex2 text-white" rel="tooltip" title="Download pdf" data-placement="bottom"><i class="fa fa-file-text fa-1x"></i> PDF</a>{% endif %}
-                    {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>{% endif %}
-                    {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
+                    {% if item.slides %}<a href="{{item.slides}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download slides" data-placement="bottom"><i class="fa fa-picture-o"></i> Slides</a>{% endif %}
+                    {% if item.poster %}<a href="{{item.poster}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Download poster" data-placement="bottom"><i class="fa fa-picture-o"></i> Poster</a>{% endif %}
                     {% if item.video %}<a href="{{item.video}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Video" data-placement="bottom"><i class="fa fa-video-camera"></i> Video</a>{% endif %}
-                    {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
+                    {% if item.webpublication %}<a href="{{item.webpublication.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.webpublication.title}}"><i class="fa fa-book"></i> Web publication</a>{% endif %}
                 </div>
                 <div class="btn-group">
                     {% if item.toolbox %}<a href="{{item.toolbox}}" class="btn btn-sm btn-success btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-file-code-o"></i> Toolbox</a>{% endif %}
-                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
-                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
+                    {% if item.data1 %}<a href="{{item.data1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data1.title}}</a>{% endif %}
+                    {% if item.data2 %}<a href="{{item.data2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" rel="tooltip" title="Toolbox" data-placement="bottom"><i class="fa fa-database"></i> {{item.data2.title}}</a>{% endif %}
                     {% if item.code1 %}<a href="{{item.code1.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code1.title}}"><i class="fa fa-file-code-o"></i> {{item.code1.title}}</a>{% endif %}
                     {% if item.git1 %}<a href="{{item.git1.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.git1.title}}"><i class="fa fa-git"></i> {{item.git1.title}}</a> {% endif %}    
                     {% if item.git2 %}<a href="{{item.git2.url}}" class="btn btn-sm btn-success" style="text-decoration:none;border-bottom:0;padding-bottom:9px" title="{{item.git2.title}}"><i class="fa fa-git"></i> {{item.git2.title}}</a>{% endif %}
@@ -1948,10 +1951,10 @@ def get_default_item_template(options):
                     {% if item.code2 %}<a href="{{item.code2.url}}" class="btn btn-sm btn-success btn-btex2" title="{{item.code2.title}}"><i class="fa fa-file-code-o"></i> {{item.code2.title}}</a>{% endif %}
                     {% if item.demo %}<a href="{{item.demo}}" class="btn btn-sm btn-primary iframe-demo btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
                     {% if item.demo_external %}<a href="{{item.demo_external}}" target="_blank" class="btn btn-sm btn-primary btn-btex2" rel="tooltip" title="Demo" data-placement="bottom"><i class="fa fa-headphones"></i> Demo</a>{% endif %}
-                    {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
-                    {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
-                    {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
-                    {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
+                    {% if item.link1 %}<a href="{{item.link1.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link1.title}}"><i class="fa fa-external-link-square"></i> {{item.link1.title}}</a>{% endif %}
+                    {% if item.link2 %}<a href="{{item.link2.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link2.title}}"><i class="fa fa-external-link-square"></i> {{item.link2.title}}</a>{% endif %}
+                    {% if item.link3 %}<a href="{{item.link3.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link3.title}}"><i class="fa fa-external-link-square"></i> {{item.link3.title}}</a>{% endif %}
+                    {% if item.link4 %}<a href="{{item.link4.url}}" class="btn btn-sm btn-info btn-btex2 text-white" title="{{item.link4.title}}"><i class="fa fa-external-link-square"></i> {{item.link4.title}}</a>{% endif %}
                 </div>
             </div>    
             """
@@ -2277,6 +2280,8 @@ def btex(content):
                 'scholar-cite-counts': boolean(get_attribute(btex_div.attrs, 'scholar-cite-counts', 'no')),
                 'scholar-link': get_attribute(btex_div.attrs, 'scholar-link', None),
                 'stats': boolean(get_attribute(btex_div.attrs, 'stats', 'no')),
+                'show_label': boolean(get_attribute(btex_div.attrs, 'show-label', 'yes')),
+                'show_authors': boolean(get_attribute(btex_div.attrs, 'show-authors', 'yes')),
                 'target_page': get_attribute(btex_div.attrs, 'target-page', None),
             }
 
@@ -2620,7 +2625,9 @@ def btex(content):
                     publication_grouping=btex_publication_grouping,
                     first_visible_year=options['first_visible_year'],
                     item_count=options['item_count'],
-                    target_page=options['target_page']
+                    target_page=options['target_page'],
+                    show_label=options['show_label'],
+                    show_authors=options['show_authors'],
                 ),
                 "html.parser"
             )
@@ -3036,6 +3043,7 @@ def register():
     signals.article_generator_finalized.connect(move_resources)
     signals.content_object_init.connect(btex)
 
+
 def update_based_on_author(author_name, bibtex_filename, cache_filename, use_proxy=None):
     bib = parse_bibtex_file(bibtex_filename)
 
@@ -3095,6 +3103,7 @@ def update_based_on_author(author_name, bibtex_filename, cache_filename, use_pro
             print('skipped', '[' + current_publication_title + ']')
 
     save_citation_data(filename=args.cache_filename, citation_data=citation_data)
+
 
 def update_based_on_source(source_name, bibtex_filename, cache_filename, use_proxy=None):
 
