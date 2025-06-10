@@ -1071,7 +1071,7 @@ def get_default_template(options):
                                 {%if show_label and not show_authors %}
                                 <small class="{{ item.type_label_css }}">{{ item.type_label_short }}</small>
                                 {% endif %}    
-                                <h4 class="list-group-item-heading">{{item.title}}</h4>
+                                <h5 class="list-group-item-heading">{{item.title}}</h5>
                             </div>
                         </div>
                         {%if show_label or show_authors %}
