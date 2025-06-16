@@ -620,7 +620,6 @@ def get_default_template(options):
                 {% endfor %}
             </div>
             """
-
     elif options['template'] == 'latest':
         if template_mode == 'bs3':
             template += """
@@ -750,7 +749,6 @@ def get_default_template(options):
                 {% endif %}
             {% endfor %}
             """
-
     elif options['template'] == 'supervisions':
         if template_mode == 'bs3':
             template += """
@@ -887,7 +885,7 @@ def get_default_template(options):
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="panel publication-item" id="{{ item.key }}" style="box-shadow: none">
                             <div class="panel-heading" role="tab" id="heading{{ item.key }}">
-                                <div class="row">
+                                <div class="row pb-2">
                                     <div class="col-1">
                                         <span class="{{ item.type_label_css }}">{{ item.type_label_short }}</span>
                                     </div>
@@ -1002,7 +1000,6 @@ def get_default_template(options):
                 {% endfor %}
             </div>
             """
-
     elif options['template'] == 'minimal':
 
         template += """
