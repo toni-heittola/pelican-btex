@@ -322,25 +322,31 @@ def get_default_template(options):
     if options['stats']:
         if template_mode == 'bs3':
             template += '<div class="panel panel-default"><div class="panel-body">'
-            template += 'Publications: {{ meta.publications }} <small><span class="text-muted">( {{ meta.types_html_list}} )</span></small>'
-            template += '<br>'
-            template += 'Cites: {{meta.cites}} '
-            template += '<small>'
-            template += '<span class="text-muted">( '
-            if options['scholar-link']:
-                template += 'according to <a href="' + options['scholar-link'] + '" target="_blank">Google Scholar</a>, '
-            template += 'Updated {{meta.cite_update_string}}'
-            template += ')</span>'
-            template += '</small>'
+            if options['template'] == 'supervisions':
+                template += 'Projects: {{ meta.publications }} <small><span class="text-muted">( {{ meta.types_html_list}} )</span></small>'
+            else:
+                template += 'Publications: {{ meta.publications }} <small><span class="text-muted">( {{ meta.types_html_list}} )</span></small>'
+                template += '<br>'
+                template += 'Cites: {{meta.cites}} '
+                template += '<small>'
+                template += '<span class="text-muted">( '
+                if options['scholar-link']:
+                    template += 'according to <a href="' + options['scholar-link'] + '" target="_blank">Google Scholar</a>, '
+                template += 'Updated {{meta.cite_update_string}}'
+                template += ')</span>'
+                template += '</small>'
             template += '</div></div>'
+
         elif template_mode == 'bs5':
             template += '<div class="card p-3">'
-            template += '<span>Publications: {{ meta.publications }} <small class="text-muted">( {{ meta.types_html_list}} )</small></span>'
-            #template += '<br>'
-            template += '<span>Cites: {{meta.cites}} <small class="text-muted">( '
-            if options['scholar-link']:
-                template += 'according to <a href="' + options['scholar-link'] + '" target="_blank">Google Scholar</a>, '
-            template += 'Updated {{meta.cite_update_string}} )</small></span>'
+            if options['template'] == 'supervisions':
+                template += '<span>Projects: {{ meta.publications }} <small class="text-muted">( {{ meta.types_html_list}} )</small></span>'
+            else:
+                template += '<span>Publications: {{ meta.publications }} <small class="text-muted">( {{ meta.types_html_list}} )</small></span>'
+                template += '<span>Cites: {{meta.cites}} <small class="text-muted">( '
+                if options['scholar-link']:
+                    template += 'according to <a href="' + options['scholar-link'] + '" target="_blank">Google Scholar</a>, '
+                template += 'Updated {{meta.cite_update_string}} )</small></span>'
             template += '</div>'
 
     if options['template'] == 'publications':
