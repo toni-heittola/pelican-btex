@@ -2309,7 +2309,13 @@ def btex(content):
                 filename=options['citations']
             )
 
-            publications = parse_bibtex_file(options['data_source'])
+            if options['data_source'] and ',' in options['data_source']:
+                options['data_source'] = options['data_source'].split(',')
+                publications = []
+                for data_source in options['data_source']:
+                    publications +=parse_bibtex_file(data_source)
+            else:
+                publications = parse_bibtex_file(options['data_source'])
 
             options['items'] = get_attribute(btex_div.attrs, 'items', None)
             if options['items']:
