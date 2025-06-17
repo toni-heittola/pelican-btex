@@ -348,7 +348,7 @@ def get_default_template(options):
             template += """
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    <h3>{{year}}</h3>
+                    {% if show_years %}<h3>{{year}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="panel publication-item" id="{{ item.key }}" style="box-shadow: none">
                             <div class="panel-heading" role="tab" id="heading{{ item.key }}">
@@ -489,7 +489,7 @@ def get_default_template(options):
             template += """
             <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
                 {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    <h3>{{year}}</h3>
+                    {% if show_years %}<h3>{{year}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="publication-item" id="{{ item.key }}" style="box-shadow: none">
                             <div class="" role="tab" id="heading{{ item.key }}">
@@ -2006,21 +2006,28 @@ def btex(content):
             citation_data = load_citation_data(filename=options['citations'])
 
             options['item'] = get_attribute(btex_item_div.attrs, 'item', None)
+            if options['item'] and ',' in options['item']:
+                options['item'] = options['item'].split(',')
+
             options['scholar-cite-counts'] = boolean(get_attribute(btex_item_div.attrs, 'scholar-cite-counts', 'no'))
             options['scholar-link'] = get_attribute(btex_item_div.attrs, 'scholar-link', None)
             options['target_page'] = get_attribute(btex_item_div.attrs, 'target-page', None)
 
             publications = parse_bibtex_file(options['data_source'])
-            item_data = search(
-                key=options['item'],
-                publications=publications
-            )
+            if not isinstance(options['item'], list):
+                options['item'] = [options['item']]
 
-            if item_data:
-                item_data = item_data[0]
+            publication_data = []
+            div_html = ''
 
-            if item_data:
-                meta = {}
+            for item_label in options['item']:
+                item_data = search(
+                    key=item_label,
+                    publications=publications
+                )
+                if item_data:
+                    item_data = item_data[0]
+
                 if 'scholar-cite-counts' in options and options['scholar-cite-counts']:
                     google_access_valid = btex_settings['google_scholar']['active']
                     current_timestamp = time.time()
@@ -2239,27 +2246,31 @@ def btex(content):
                     else:
                         item_data['citation_url'] = None
 
-                meta['cite_update'] = newest_citation_update(citation_data, publications)
+                publication_data.append(item_data)
 
-                div_text = btex_item_div.text
-                div_text = div_text.rstrip('\r\n').replace(" ", "")
-                has_template = False
-                if len(div_text):
-                    has_template = True
+                if item_data:
+                    meta = {}
+                    meta['cite_update'] = newest_citation_update(citation_data, publications)
 
-                if not has_template:
-                    btex_item_div.string = get_default_item_template(options)
+                    div_text = btex_item_div.text
+                    div_text = div_text.rstrip('\r\n').replace(" ", "")
+                    has_template = False
+                    if len(div_text):
+                        has_template = True
 
-                template = Template(btex_item_div.prettify().strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
+                    if not has_template:
+                        btex_item_div.string = get_default_item_template(options)
 
-                div_html = BeautifulSoup(template.render(
-                    item=item_data,
-                    meta=meta,
-                    target_page=options['target_page'],
-                    uuid=options['uuid']
-                ), "html.parser")
+                    template = Template(btex_item_div.prettify().strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
 
-                btex_item_div.replaceWith(div_html)
+                    div_html += str(BeautifulSoup(template.render(
+                        item=item_data,
+                        meta=meta,
+                        target_page=options['target_page'],
+                        uuid=options['uuid']
+                    ), "html.parser"))
+
+            btex_item_div.replaceWith(BeautifulSoup(div_html,"html.parser") )
 
     if btex_divs:
         if btex_settings['debug_processing']:
@@ -2276,6 +2287,7 @@ def btex(content):
                 'citations': get_attribute(btex_div.attrs, 'citations', 'btex_citation_cache.yaml'),
                 'template': get_attribute(btex_div.attrs, 'template', 'publications'),
                 'years': get_attribute(btex_div.attrs, 'years', None),
+                'show-years': boolean(get_attribute(btex_div.attrs, 'show-years', 'yes')),
                 'item_count': get_attribute(btex_div.attrs, 'item-count', None),
                 'scholar-cite-counts': boolean(get_attribute(btex_div.attrs, 'scholar-cite-counts', 'no')),
                 'scholar-link': get_attribute(btex_div.attrs, 'scholar-link', None),
@@ -2296,6 +2308,20 @@ def btex(content):
             )
 
             publications = parse_bibtex_file(options['data_source'])
+
+            options['items'] = get_attribute(btex_div.attrs, 'items', None)
+            if options['items']:
+                if options['items'] and ',' in options['items']:
+                    options['items'] = options['items'].split(',')
+                if not isinstance(options['items'], list):
+                    options['items'] = [options['items']]
+
+                if options['items']:
+                    selected_publications = []
+                    for item in publications:
+                        if item['key'] in options['items']:
+                            selected_publications.append(item)
+                    publications = selected_publications
 
             meta = {}
             if 'scholar-cite-counts' in options and options['scholar-cite-counts']:
@@ -2628,6 +2654,7 @@ def btex(content):
                     target_page=options['target_page'],
                     show_label=options['show_label'],
                     show_authors=options['show_authors'],
+                    show_years=options['show-years']
                 ),
                 "html.parser"
             )
