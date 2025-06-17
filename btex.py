@@ -354,7 +354,7 @@ def get_default_template(options):
             template += """
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    {% if show_years %}<h3>{{year}}</h3>{% endif %}
+                    {% if show_years %}<h3>{{year|int}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="panel publication-item" id="{{ item.key }}" style="box-shadow: none">
                             <div class="panel-heading" role="tab" id="heading{{ item.key }}">
@@ -495,7 +495,7 @@ def get_default_template(options):
             template += """
             <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
                 {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    {% if show_years %}<h3>{{year}}</h3>{% endif %}
+                    {% if show_years %}<h3>{{year|int}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="publication-item" id="{{ item.key }}" style="box-shadow: none">
                             <div class="" role="tab" id="heading{{ item.key }}">
@@ -625,7 +625,7 @@ def get_default_template(options):
             template += """
             {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
                 {% if (year|int)>(first_visible_year|int) %}
-                    <h3>{{(year|int)}}</h3>
+                    {% if show_years %}<h3>{{year|int}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="row publication-item">
                             <div class="col-md-1">
@@ -691,7 +691,7 @@ def get_default_template(options):
             template += """
             {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
                 {% if (year|int)>(first_visible_year|int) %}
-                    <h3>{{(year|int)}}</h3>
+                    {% if show_years %}<h3>{{year|int}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="row publication-item">
                             <div class="col-1">
@@ -754,7 +754,7 @@ def get_default_template(options):
             template += """
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    <h3>{{year}}</h3>
+                    {% if show_years %}<h3>{{year|int}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="panel publication-item" id="{{ item.key }}" style="box-shadow: none">
                             <div class="panel-heading" role="tab" id="heading{{ item.key }}">
@@ -881,7 +881,7 @@ def get_default_template(options):
             template += """
             <div class="panel-group pb-3" id="accordion" role="tablist" aria-multiselectable="true">
                 {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
-                    <h3>{{year}}</h3>
+                    {% if show_years %}<h3>{{year|int}}</h3>{% endif %}
                     {% for item in year_group|sort(attribute='year') %}
                         <div class="panel publication-item" id="{{ item.key }}" style="box-shadow: none">
                             <div class="panel-heading" role="tab" id="heading{{ item.key }}">
@@ -1001,7 +1001,6 @@ def get_default_template(options):
             </div>
             """
     elif options['template'] == 'minimal':
-
         template += """
             {% for year, year_group in publications|groupby('year')|sort(reverse=True) %}
                 {% if (year|int)>(first_visible_year|int) %}
